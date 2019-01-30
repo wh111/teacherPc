@@ -1,0 +1,546 @@
+<!--
+****--@file     groupManage
+****--@date     2018/3/15 11:42
+****--@author   wh
+****--@describe   班组管理
+-->
+<template>
+    <div class="groupManage-root">
+        <h1 class="h1">我的班组</h1>
+        <div class="groupManage-top">
+            <div class="titel left banji"> 班级群：</div>
+            <el-tabs class="tab" v-model="selectGroup" @tab-click="handleClickTop">
+                <el-tab-pane :label="item.title" v-for="item in groupList" :key="item.id"></el-tab-pane>
+            </el-tabs>
+            <!--<span class="classified">-->
+            <!--<span class="titel" v-for="item in groupList"-->
+            <!--:class="selectClass==item.id?'active':''"-->
+            <!--@click="changeTitle(item)"-->
+            <!--:key="item.id">{{item.title}} </span>-->
+            <!--</span>-->
+            <el-button class="but left" @click="createClass('新建班级群','0')"><i class="el-icon-plus"></i>新建</el-button>
+            <el-dropdown class="tabs">
+            <span class="el-dropdown-link">
+            更多<i class="el-icon-arrow-down el-icon--right"></i>
+           </span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click.native="showManage('class')" :disabled="!selectGroup||!groupList.length">班组管理</el-dropdown-item>
+                    <el-dropdown-item :disabled="!selectGroup||!groupList.length" @click.native="makeHomework('selectGroup')">布置作业
+                    </el-dropdown-item>
+                    <el-dropdown-item @click.native="beginMatch" :disabled="!selectGroup||!groupList.length">发布测评</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </div>
+        <div class="groupManage-top">
+            <div class="titel left banji"> 小组群：</div>
+            <el-tabs class="tab" v-model="activeName" @tab-click="handleClick">
+                    <el-tab-pane :label="item.title" v-for="item in groupListofSmallList" :key="item.id"></el-tab-pane>
+            </el-tabs>
+            <el-button class="but  left" @click="createClass('新建小组群','1')"><i class="el-icon-plus"></i>新建</el-button>
+            <el-dropdown class="tabs">
+            <span class="el-dropdown-link">
+            更多<i class="el-icon-arrow-down el-icon--right"></i>
+           </span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item @click.native="showManage('smallGroup')" :disabled="!activeName||!groupListofSmallList">班组管理</el-dropdown-item>
+                    <el-dropdown-item :disabled="!activeName||!groupListofSmallList" @click.native="makeHomework('activeName')">布置作业
+                    </el-dropdown-item>
+                    <el-dropdown-item @click.native="beginMatch" :disabled="!activeName||!groupListofSmallList">发布测评</el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </div>
+        <!--<p class="groupManage-top"><span>班组成员（ {{totalCount}} 人） </span>-->
+        <!--<el-button class="but" @click="showManage">班组管理</el-button>-->
+        <!--<router-link :to="{name:'makeHomework',params:{name:'1',id:groupId}}">-->
+        <!--<el-button class="but">布置作业</el-button>-->
+        <!--</router-link>-->
+
+        <!--<el-button class="but" @click="beginMatch">发布测评</el-button>-->
+        <!--</p>-->
+        <div class="groupsDetailRight">
+            <div class="tile"><span><i class="el-icon-arrow-down" style="color:#bebebe"></i>班组成员（{{totalCount}}） </span>
+            </div>
+            <div class="grouplist">
+                <div style="overflow: auto;height: 610px;overflow-x: hidden">
+                    <div class="person" :class="personId==item.id?'personActive':''"
+                         v-for="(item,index) in groupMessage" @click='seleectTodeatail(item)'>
+                        <div class="pic">
+                            <user-head-img :wh="30" :src="item.icon"></user-head-img>
+                            <!---->
+                            <!--<img style="width: 30px;height: 30px" :src="item.icon"/></div>-->
+                        </div>
+                        <div class="pos"><img v-if="item.contrast==-1" src="../../assets/images/bottom.gif"/> <img
+                                v-else-if="item.contrast==1" src="../../assets/images/top.gif"/><span v-else
+                                                                                                      class="top">-</span></div>
+                        <span class="name" style="padding-right: 3px">{{item.name}}</span>(<span style="color:#fd7416;padding: 0 3px"> {{item.sex|sex}}</span>)
+                        <!--<span class="warn">{{item.sex | sex}}</span>-->
+
+                        <!--<span class="bottom" v-if="item.contrast==-1"><i class="el-icon-sort-down"></i></span>-->
+                        <!--<span class="top" v-else-if="item.contrast==0"><i class="el-icon-sort-up"></i></span>-->
+                        <!--<span class="top" v-else><i class="el-icon-minus"></i></span>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="right">
+            <div v-show="JSON.stringify(personDetail)!='{}'">
+                <div class="pic">
+                    <user-head-img style="margin-left: 260px" :wh="80" :src="personDetail.icon"></user-head-img>
+                    <p class="sex"><b style="font-size: 18px">{{personDetail.name}} </b> <img
+                            v-if="personDetail.sex=='1'"
+                            src="../../assets/images/selfdata (5).gif"/><img
+                            v-else src="../../assets/images/selfdata (4).gif"/></p>
+
+                    <ul style="">
+                        <li> 姓名：{{personDetail.name}}</li>
+                        <li> 所属班组：{{groupId.title}}
+                            <el-button class="orangeYellow" style="position: relative" @click="changeGroupOf"><i class="el-icon-edit"></i>调整
+                            </el-button>
+                        </li>
+                        <li>手机号码 ：{{personDetail.mobile}}</li>
+                    </ul>
+
+                    <!--<span>{{personDetail.name}}</span><span class="span"-->
+                    <!--style="color: #fc4341;">（{{personDetail.sex | sex}}）</span>-->
+                    <!--<span> 所属班组：{{groupId.title}}</span>-->
+                    <!--<el-button class="but" @click="changeGroupOf">调整班组</el-button>-->
+
+                </div>
+
+                <!--<p><span>手机号码 ：{{personDetail.mobile}}</span></p>-->
+
+
+                <div class="groupsDetailtitle" style="margin-top: 0">
+                  近期成绩：
+                </div>
+                <div id="picOfGrade" style="height: 217px;position: relative">
+                    <div class="growthArchives-root-timeborder">
+                        <button class="seeHistory" :class="{focus:selectbefore==1}" @click="selectbefore1(1)">
+                            作业
+                        </button>
+                        <button class="seeHistory" :class="{focus:selectbefore==2}" @click="selectbefore1(2)">
+                            测评
+                        </button>
+                    </div>
+                    <div id="passGrade1" ><span>暂无数据</span></div>
+                    <p class="passGrade1-p"  v-if="this.lineMap.date.length <= 0">暂无数据</p>
+                </div>
+                <div class="groupsDetailtitle" style="margin-top: 0;height: 50px">
+                    &nbsp;备注： <el-input class="textArea" style="width: 86%;max-height: 50px" type="textarea" v-model="personDetail.remark" :rows="2"></el-input>
+                </div>
+                <div style="width: 98%">
+                    <el-button  style="" class="but makeMessage orangeYellow"
+                               @click='addMessage'>提交备注
+                    </el-button>
+                </div>
+            </div>
+            <div v-show="JSON.stringify(personDetail)=='{}'" class="err"><img style="width: 204px" src="../../assets/images/err.png"/></div>
+        </div>
+        <!--创建群组-->
+        <Modal :mask-closable="false" width="360" :title="createTitle" v-model="createGroup"
+               class-name="toCreateTitle" :loading="loading">
+            <modal-header slot="header" :content="toCreateGroup"></modal-header>
+            <to-create v-if="createGroup" :groupType='groupType' @cancel="cancel"
+                       @createGroupSuccess="createGroupSuccess"></to-create>
+            <div slot="footer"></div>
+        </Modal>
+        <!--更改群组-->
+        <Modal :mask-closable="false" width="360" :title="createTitle" v-model="changeGroupIt"
+               class-name="toCreateTitle" :loading="loading">
+            <modal-header slot="header" :content="toCreateGroup"></modal-header>
+            <change-group v-if="changeGroupIt" @cancel="cancel" :types='types' :groupId="groupId" :personId='personId'
+                          @changeGroupSuccess="changeGroupSuccess"></change-group>
+            <div slot="footer"></div>
+        </Modal>
+        <!--班组管理-->
+        <Modal :mask-closable="false" width="900" title="班组管理" v-model="manageGroupIt"
+               class-name="tomanageTitle" :loading="loading">
+            <modal-header slot="header" :content="toManageGroup"></modal-header>
+            <manage-group v-if="manageGroupIt" @cancel="cancel" :id='groupId.id' :typeOfSmall="typeOfSmall"
+                          @changeGroupSuccess="deleteGroup" @reRequset="reRequset" @getGroupList="reGetGroupList"></manage-group>
+            <div slot="footer"></div>
+        </Modal>
+        <!--发布测评-->
+        <Modal :mask-closable="false" width="360" title="请选择组卷方式：" v-model="publishMatch"
+               class-name="tomanageTitle" :loading="loading">
+            <modal-header slot="header" :content="publishMatchIT"></modal-header>
+            <publish v-if="publishMatch" @cancel="cancel"
+                     @closeIdentification="closeIdentification" :groupId="groupId.id"></publish>
+            <div slot="footer"></div>
+        </Modal>
+    </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+
+  let Util = null
+  import api from './api'
+  import toCreate from './toCreate.vue'
+  import changeGroup from './changGroup'
+  import echarts from 'echarts'
+  import manageGroup from './manageGroup'
+  import userHeadImg from '../../components/common/userHeadImg.vue'
+  import publish from './components/publish.vue'
+
+  export default {
+
+    data () {
+      return {
+        groupType: '',//创建群组类型
+        selectGroup: '',
+        groupList: [],
+        groupListofSmallList: [],
+        createTitle: '新建小组群',
+        createGroup: false,
+        changeGroupIt: false,
+        manageGroupIt: false,
+        publishMatch: false,
+        toCreateGroup: {
+          title: '调整班组',
+          id: 'toCreateGroupId'
+        },
+        toManageGroup: {
+          title: '群信息',
+          id: 'toManageGroupId'
+        },
+        publishMatchIT: {
+          title: '请选择组卷方式：',
+          id: 'toManageGroupId'
+        },
+        activeName: '',
+        selectClass: '',
+        groupListofSmall: '',
+        loading: true,
+        peopleList: [],
+        message: '',
+        groupId: {},
+        groupMessage: [],
+        personId: '',
+        personDetail: {},
+        lineMap: {
+          date: [],
+          score: [],
+        },
+        types: '0',
+        totalCount: 0,
+        selectbefore: 1,
+        typeOfSmall:'class',
+      }
+    },
+    methods: {
+      makeHomework (val) {//布置作业
+        if (this[val]) {
+          this.$router.push({name: 'createPaper', params: {type: 'homework', groupId: this.groupId.id}})
+        }
+      },
+      //重新请求
+      reRequset () {
+        this.requestDetail()
+      },
+      //初始化请求列表数据
+      init () {
+        Util = this.$util
+      },//删除群组成功
+      deleteGroup () {
+        this.manageGroupIt = false
+        this.getGroupList()
+        //this.getGroupListgroup();
+      },
+      selectbefore1 (val) {
+        this.selectbefore = val
+        this.drawMap(val)
+      },
+      handleClick (tab, event) {
+        this.changeTitleofSmall(this.groupListofSmallList[this.activeName])
+        this.types = '1'
+        this.selectGroup = ''
+      },
+      reGetGroupList(val){//修改班组名重新请求
+        this.manageGroupIt=false;
+            if(this.selectGroup){
+              this.getGroupList()
+            }else {
+              this.groupListofSmallList[this.activeName].title=val
+            }
+      },
+      handleClickTop (tab, event) {
+        this.changeTitle(this.groupList[this.selectGroup])
+        this.types = '0'
+        this.activeName = ''
+      },
+      //班组群
+      getGroupList () {
+        this.ajax({
+          ajaxSuccess: res => {
+            this.groupList = res.data.dataList
+            if (this.groupList[0]) {this.changeTitle(this.groupList[0])}
+            this.getGroupListgroup()
+          },
+          ajaxParams: {
+            url: api.getGroups.path,
+            method: api.getGroups.method,
+            params: {
+              types: 0
+            },
+          },
+        })
+      },//获取班组成员详情（含近期成绩）
+      seleectTodeatail (val) {
+        this.personId = val.id
+        this.selectDetail()
+      },//获取班组成员详情（含近期成绩）
+      selectDetail () {
+        this.ajax({
+          ajaxSuccess: res => {
+            this.personDetail = res.data
+            this.personDetail.icon = this.getStaticPath(this.personDetail.icon)
+            this.selectbefore=1;
+            this.drawMap(1)
+          },
+          ajaxParams: {
+            url: api.requestDetail.path,
+            method: api.requestDetail.method,
+            params: {
+              id: this.personId,
+              groupId: this.groupId.id
+            },
+          },
+        })
+      },//个人成绩折线图
+      drawMap (num) {
+        this.lineMap = {
+          date: [],
+          score: [],
+        }
+        if (num == 1) {
+          if (this.personDetail.workScoreStatistics) {
+            this.personDetail.workScoreStatistics.map((item) => {
+              this.lineMap.date.push(this.conductDate(item.date,'MM-dd HH:mm') )
+              this.lineMap.score.push(item.score)
+            })
+          }
+        } else if (num == 2) {
+          if (this.personDetail.testScoreStatistics) {
+            this.personDetail.testScoreStatistics.map((item) => {
+              this.lineMap.date.push(this.conductDate(item.date,'MM-dd HH:mm'))
+              this.lineMap.score.push(item.score)
+            })
+          }
+        }
+        if (this.groupList.length > 0 && this.selectGroup == '0') {
+          this.activeName = ''
+        }
+        // if (this.lineMap.date.length != 0) {
+        this.passGrade()
+        // }
+      },
+      //创建班组成功
+      createGroupSuccess () {
+        this.getGroupList()
+        // this.getGroupListgroup()
+        this.createGroup = false
+      },//获取小组群
+      getGroupListgroup () {
+        this.ajax({
+          ajaxSuccess: res => {
+            this.groupListofSmallList = res.data.dataList
+            if (this.groupList.length > 0) {
+              this.activeName = ''
+            }
+            if (this.groupList.length == 0 && this.groupListofSmallList[0]) {
+              this.types = '1'
+              if (this.groupListofSmallList.length != 0) {
+                this.changeTitleofSmall(this.groupListofSmallList[0])
+                this.activeName = '0'
+              } else {
+                this.totalCount = 0
+                this.groupMessage = []
+                this.personDetail = {}
+                this.personId = ''
+              }
+
+            }
+
+          },
+          ajaxParams: {
+            url: api.getGroups.path,
+            method: api.getGroups.method,
+            params: {
+              types: '1'//
+            },
+          },
+        })
+      },
+      //班组弹窗
+      showManage (val) {
+        this.manageGroupIt = true
+         this.typeOfSmall=val;
+      },
+      changeTitle (val) {
+        this.selectClass = val.id
+        this.groupId = val
+        this.requestDetail()
+      },
+      //调整班组
+      changeGroupOf () {
+        this.changeGroupIt = true
+      },
+      //更改班组成功
+      changeGroupSuccess (val) {
+        this.changeGroupIt = false
+        var m = {}
+        m.id = val
+        this.requestDetail()
+//        if (this.types == 0) {
+//
+//          this.changeTitle(m)
+//        } else {
+//          this.changeTitleofSmall(m)
+//        }
+        //this.groupList.map()
+      },
+      changeTitleofSmall (val) {
+        this.groupListofSmall = val.id
+        this.selectClass = ''
+        this.groupId = val;
+        this.requestDetail()
+      },
+      createClass (str, type) {
+        this.toCreateGroup.title = str
+        this.groupType = type
+        this.createGroup = true
+      },//发布测评
+      beginMatch () {
+        this.publishMatch = true
+      },
+      //获取班组成员列表
+      requestDetail () {
+        this.ajax({
+          ajaxSuccess: 'getListSuccsee',
+          ajaxParams: {
+            url: api.request.path,
+            method: api.request.method,
+            params: {
+              id: this.groupId.id//
+            },
+          },
+        })
+      },
+      getListSuccsee (res) {
+        this.groupMessage = res.data.dataList
+        this.groupMessage.map((item) => {item.icon = this.getStaticPath(item.icon);console.log(item.sex==null); if(item.sex==null){item.sex=0}})
+        this.totalCount = res.data.totalCount
+        if (this.groupMessage[0]) {
+          this.seleectTodeatail(this.groupMessage[0])
+        } else {
+          this.personDetail = {}
+        }
+      },
+      cancel () {
+        this.createGroup = false
+        this.changeGroupIt = false
+        this.manageGroupIt = false
+        this.publishMatch = false
+      }
+      ,
+      closeIdentification () {
+        this.createGroup = false
+        this.changeGroupIt = false
+        this.manageGroupIt = false
+        this.publishMatch = false
+      },
+      addMessage () {//添加备注
+        if (!this.personDetail.remark) {
+          this.personDetail.remark = ''
+        }
+        if (this.personDetail.remark.length >= 200 || this.personDetail.remark.length <= 0) {
+          this.errorMess('请输入200字以内的备注')
+          return false
+        }
+        this.ajax({
+          ajaxSuccess: res => {
+            this.$message({
+              message: '提交备注成功',
+              type: 'success'
+            })
+          },
+          ajaxParams: {
+            url: api.studentEditRemark.path,
+            method: api.studentEditRemark.method,
+            data: {
+              groupsId: this.groupId.id,
+              studentId: this.personDetail.id,
+              remark: this.personDetail.remark//
+            },
+          },
+        })
+      },
+      passGrade () {
+        //myProjectprecent-numofquestion
+        if(document.getElementById('passGrade1')) {
+          if (this.lineMap.date.length > 0) {
+            document.getElementById('passGrade1').style.visibility='visible';
+            let aa = echarts.init(document.getElementById('passGrade1'))
+            // let datalist=this.personDetail.workScoreStatistics;
+            aa.setOption({
+              tooltip: {
+                trigger: 'axis',
+              },
+              toolbox: {
+                show: true,
+                feature: {},
+              },
+              xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: this.lineMap.date,
+              },
+              yAxis: {
+                type: 'value',
+                axisLabel: {
+                  formatter: '{value} ',
+                },
+              },
+              series: [
+                {
+                  name: '分数',
+                  type: 'line',
+                  data: this.lineMap.score,
+                  markLine: {
+                    data: [],
+                  },
+                },
+              ],
+            })
+          }else {
+            document.getElementById('passGrade1').style.visibility='hidden';
+          }
+        }
+      }
+
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+      this.$nextTick(() => {
+        this.getGroupList();
+     // this.passGrade()
+      })
+
+
+    },
+    components: {
+      userHeadImg,
+      toCreate,
+      changeGroup,
+      manageGroup,
+      echarts,
+      publish
+    }
+  }
+
+</script>
+<style lang="scss">
+    @import '../css/groupManage.scss'
+</style>

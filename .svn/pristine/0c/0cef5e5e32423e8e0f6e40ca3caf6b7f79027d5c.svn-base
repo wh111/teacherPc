@@ -1,0 +1,284 @@
+<!--
+****--@file     deleteOrCreatemessage
+****--@date     2018/3/16 11:49
+****--@author   wh
+****--@describe   删除群组/创建群通知
+-->
+<template>
+    <div class="deleteOrCreate-root">
+        <div v-if="type=='createMessage'">
+            <div v-if="!iSee">
+                <el-input type="textarea" v-model="message" :rows="2"></el-input>
+                <el-button @click="change">发布</el-button>
+            </div>
+            <div v-if="iSee">
+                <p> 群通知发布成功！</p>
+                <el-button @click="close">我知道了</el-button>
+            </div>
+
+        </div>
+        <div v-if="type=='addpeople'">
+            <div v-if="!iSee&&typeOfSmall=='class'">
+                群成员：
+                <!--<el-input style="width: 240px" type="text" placeholder="输入成员账号" v-model="addMessage"></el-input>-->
+                <el-autocomplete style="width: 240px"
+                        class="inline-input"
+                        v-model="selectPerson"
+                        :fetch-suggestions="querySearch"
+                        placeholder="输入成员账号"
+                        :trigger-on-focus="false"
+                        @select="handleSelect"
+                ></el-autocomplete>
+                <el-button @click="change">确定</el-button>
+            </div>
+            <div v-if="!iSee&&typeOfSmall=='smallGroup'" style="text-align: left    ">
+                群成员：
+                <el-checkbox-group v-model="checkedpeople" @change="getStuList">
+                    <el-checkbox v-for="item in personList" :label="item.id" :key="item.id" class="optionOfGroup">{{item.name}}</el-checkbox>
+                </el-checkbox-group>
+                <div style="text-align: center">
+                    <el-button @click="change">确定</el-button>
+                </div>
+
+            </div>
+            <div v-if="iSee">
+                <p>已向指定成员发送邀请！</p>
+                <el-button @click="close">我知道了</el-button>
+            </div>
+        </div>
+        <div v-if="type=='deletePeople'">
+            <div v-if="!iSee">
+                <p>确定要删除 [{{ruleForm.title}}] 群组吗？</p>
+                <el-button @click="change">确定删除</el-button>
+            </div>
+            <div v-if="iSee">
+                <p>群组 [{{ruleForm.title}}] 已删除！</p>
+                <el-button @click="close">我知道了</el-button>
+            </div>
+        </div>
+        <div v-if="type=='submitMetion'">
+            <div>
+                <p>任务已提交，等待系统进行审核，审
+                    核通过后按照任务时间自动发布。</p>
+                <el-button @click="close">我知道了</el-button>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+
+  import api from '../api'
+
+  let Util = null
+
+  export default {
+    props: ['type', 'id', 'ruleForm','typeOfSmall'],
+    data () {
+      return {
+        message: '',
+        iSee: false,
+        addMessage: '',
+        checkedpeople:[],
+        personList:[],
+        selectPerson:'',
+        restaurants:[],//返回的数据列表
+        stuNum:'',
+      }
+    },
+    methods: {
+      //初始化请求列表数据
+      init () {
+        Util = this.$util;
+
+       if(this.typeOfSmall=='smallGroup'){
+
+          this.getPersonList();//获取成员列表
+       }
+      },
+      querySearch(queryString, cb) {
+        var m=setTimeout(()=>{
+          clearTimeout(m);
+         // this.getClassPeopleList();//模糊搜索班组成员
+
+          this.ajax({
+            ajaxSuccess: res => {
+              res.data.dataList.map((item)=>{
+                item.value=item.account+'('+item.name+')';
+
+              })
+              //this.restaurants=res.data.dataList
+              this.restaurants= res.data.dataList;
+              var restaurants = this.restaurants
+              var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants
+              //  res.data.dataList;
+              cb(results);
+            },
+            ajaxParams: {
+              async: false,
+              url: api.likeList.path,
+              method: api.likeList.method,
+              params: {
+                like:this.selectPerson,
+              },
+            },
+          })
+//          var restaurants = this.restaurants;
+//          var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+
+          // 调用 callback 返回建议列表的数据
+        },1000)
+
+      },
+      getClassPeopleList(){
+
+      },
+      createFilter(queryString) {
+        return (restaurant) => {
+          return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        };
+      },
+      handleSelect(item) {
+        this.stuNum=item.account;
+      },
+      getPersonList(){
+        this.ajax({
+          ajaxSuccess: res => {
+            this.personList=res.data.dataList;
+          },
+          ajaxParams: {
+            url: api.getGradeStudent.path,
+            method: api.getGradeStudent.method,
+            params: {
+              id: this.id,
+            },
+          },
+        })
+      },
+      getStuList(){
+        console.log(this.checkedpeople.toString())
+      },
+      change () {
+        if (this.type == 'deletePeople') {
+          this.ajax({
+            ajaxSuccess: res => {
+              this.iSee = true
+            },
+            ajaxParams: {
+              url: api.disbanded.path,
+              method: api.disbanded.method,
+              params: {
+                id: this.id
+              },
+            },
+          })
+        } else if (this.type == 'createMessage') {
+          if (this.message.length >= 100 || this.message.length <= 0) {
+            this.errorMess('请输入不大于100个字符的群通知')
+            return false
+          }
+
+            this.ajax({
+              ajaxSuccess: res => {
+                this.iSee = true
+              },
+              ajaxParams: {
+                url: api.groupsNotice.path,
+                method: api.groupsNotice.method,
+                data: {
+                  title: '',
+                  content: this.message,
+                  groups_id: this.id,
+                },
+              },
+            })
+
+
+        } else if (this.type == 'addpeople') {
+          if(this.typeOfSmall=='class'){
+            if(!this.stuNum){
+              this.errorMess('没有可添加的人员请创建班级人员');
+              return
+            }
+            this.ajax({
+              ajaxSuccess: res => {
+                this.iSee = true
+
+              },
+              error: res => {
+                console.log(res)
+              },
+              ajaxParams: {
+                url: api.addStudent.path,
+                method: api.addStudent.method,
+                data: {
+                  account: this.stuNum,
+                  id: this.id,
+                },
+              },
+            })
+          }else{
+            if(!this.checkedpeople.length){
+              this.errorMess('请选择要添加的人');
+              return
+            }
+            this.ajax({
+              ajaxSuccess: res => {
+                this.iSee = true
+
+              },
+              error: res => {
+                console.log(res)
+              },
+              ajaxParams: {
+                url: api.addStudents.path,
+                method: api.addStudents.method,
+                data: {
+                  ids: this.checkedpeople.toString(),
+                  id: this.id,
+                },
+              },
+            })
+          }
+
+        }
+
+      },
+      close () {
+        this.$emit('closeModel')
+      }
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+
+    },
+    components: {}
+  }
+
+</script>
+<style lang="scss">
+    .deleteOrCreate-root {
+        text-align: center;
+        .el-button {
+            background: #fd7416;
+            border: none;
+            margin-top: 10px;
+            color: white;
+        }
+        .optionOfGroup{
+            font-size: 12px;
+            margin-left: 0px;
+            padding-right: 20px;
+            width: 50%;
+            overflow: hidden
+        }
+
+
+    }
+
+    .toOpenModel .ivu-modal-footer {
+        display: none;
+    }
+</style>

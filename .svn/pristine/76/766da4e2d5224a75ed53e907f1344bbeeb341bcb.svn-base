@@ -1,0 +1,283 @@
+<!--
+****--@file     list
+****--@date     2018/3/19 11:57
+****--@author   YC
+****--@describe 我的试题
+-->
+<template>
+    <el-row class="myTestQuestion">
+        <el-col class="status-type">
+            <el-col :span="14" class="navBtns">
+                <span class="btn active" style="color: #11a63f">我的试题</span>
+            </el-col>
+            <el-col :span="10" align="right" class="todoBtns">
+                <!--<router-link to="./myQuestion/edit/6">-->
+                <el-button @click="toChannelModal=true" class="greenButton" ><b><i class="ivu-icon ivu-icon-arrow-down-a" style="font-weight: bold"></i></b>  导入试题</el-button>
+                <!--</router-link>-->
+                <router-link to="./myQuestion/add/-1">
+                    <el-button class="greenButton">  <b><i class="el-icon-plus" style="font-weight: bold"></i></b>  新建试题</el-button>
+                </router-link>
+            </el-col>
+        </el-col>
+        <el-col class="filterBox">
+            <subject-type :showItems="showItem" :subject="$store.state.user.info.subject" @change="headChange"></subject-type>
+        </el-col>
+        <el-col class="orderBox" align="right">
+            排序：
+            <span :class="{'active':searchObj.sortBy===''}" @click="sortbyCall('')">默认</span>
+            <span :class="{'active':searchObj.sortBy==='createTime'}" @click="sortbyCall('createTime')">
+                时间
+                <i class="el-icon-arrow-down" v-if="searchObj.sortBy==='createTime' && searchObj.order==='desc'"></i>
+                <i class="el-icon-arrow-up" v-else></i>
+            </span>
+            <span :class="{'active':searchObj.sortBy==='usedNum'}" @click="sortbyCall('usedNum')">
+                使用次数
+                <i class="el-icon-arrow-down" v-if="searchObj.sortBy==='usedNum' && searchObj.order==='desc'"></i>
+                <i class="el-icon-arrow-up" v-else></i>
+            </span>
+            <span :class="{'active':searchObj.sortBy==='diffLevel'}" @click="sortbyCall('diffLevel')">
+                难度
+                <i class="el-icon-arrow-down" v-if="searchObj.sortBy==='diffLevel' && searchObj.order==='desc'"></i>
+                <i class="el-icon-arrow-up" v-else></i>
+            </span>
+        </el-col>
+        <el-col>
+            <template v-if="totalCount">
+                <el-col class="questionBankListItem" v-for="item in tableData" :key="item.id">
+                    <el-col class="topBox">
+                        <el-col :span="14" class="leftInfo">
+                            <span>题型：{{ item.questionsTypeName }}</span>
+                            <span>|</span>
+                            <span>题目难度：{{ item.diffLevelCode | diffLevelCode(self) }}({{ item.diffLevel }})</span>
+                            <span>|</span>
+                            <span>使用次数：{{ item.usedNum || 0 }}</span>
+                        </el-col>
+                        <el-col :span="10" align="right" class="rightInfo">
+                            <span>创建时间：{{ item.createTime | formatDate('yyyy-MM-dd HH:mm') }}</span>
+                        </el-col>
+                    </el-col>
+                    <el-col :span="20" class="contentBox">
+                        <p class="contentText">
+                            <router-link :to="'./myQuestions/view/'+item.id">
+                                {{ item.publics ? '公共候选项题' : item.title| delHtmlTag('true') | sliceText(20,'...') }}
+                            </router-link>
+                        </p>
+                    </el-col>
+                    <el-col :span="4" class="contentBox todoBtnBox" align="center">
+                        <router-link :to="'./myQuestion/edit/'+item.id">
+                        <el-button class="todoBtns orange orangeYellow">
+                          修改
+                        </el-button>
+                        </router-link>
+                        <el-button class="todoBtns whiteButton" @click="remove(item)">删除</el-button>
+                    </el-col>
+                </el-col>
+            </template>
+            <p v-else class="tableNoDataTips">暂无数据</p>
+        </el-col>
+        <el-col v-if="totalCount" class="pagination" align="center">
+            <el-pagination @size-change="changePageSize" @current-change="changePage"
+                           :current-page.sync="myPages.currentPage" :page-size="myPages.pageSize"
+                           layout="total,prev, pager, next, jumper" :total="totalCount">
+            </el-pagination>
+        </el-col>
+        <!--删除弹窗-->
+        <Modal :mask-closable="false" height="200" v-model="removeModal" class-name="vertical-center-modal-deleteQue"
+               :loading="loading" :width="300">
+            <modal-header slot="header" :content="headerContent.removeId"></modal-header>
+            <remove v-if="removeModal" :delete-url="deleteUrl" @remove="subCallback" @cancel="cancel"
+                    :operaility-data="operailityData"></remove>
+            <div slot="footer"></div>
+        </Modal>
+        <!--导入弹窗-->
+        <Modal :mask-closable="false" close-on-click-modal="false" height="200" v-model="toChannelModal" title="对话框标题"
+               class-name="vertical-center-modal" :width="800">
+            <modal-header slot="header" :content="toChannelId"></modal-header>
+            <to-channel v-if="toChannelModal" @remove="subCallback" @cancel="cancel" @toChannel="subCallback"
+                       :operaility-data="operailityData"></to-channel>
+            <div slot="footer"></div>
+        </Modal>
+    </el-row>
+</template>
+<script>
+  /*当前组件必要引入*/
+  import api from './api'
+  import subjectType from '../../../components/common/subjectHead'
+  import toChannel from './questions_toChannel.vue'
+  //当前组件引入全局的util
+  let Util = null
+  export default {
+    name: 'myTestQuestionList',
+    data () {
+      return {
+        showItem: ['grade', 'term', 'chapter', 'knowledge', 'diffLevelCode'],
+        toChannelModal: false,
+        self: this,
+        toChannelId: {
+          id: 'toChannelId',
+          title: '导入'
+        },
+        loading: false,
+        searchObj: {sortBy: '', order: ''},
+        totalCount: 0,
+        tableData: [],
+        headerSelectObj: {},
+        deleteUrl: api.remove.path,
+        operailityData: '',
+        headerContent: {
+          removeId: {
+            id: 'removeId',
+            title: '删除试题'
+          }
+        }
+      }
+    },
+    methods: {
+      //初始化请求列表数据
+      init () {
+        console.log(this.$store.state)
+        Util = this.$util
+        this.myPages = this.queryQptions = {
+          curPage: 1,
+          pageSize: Util.pageInitPrams.pageSize,
+        }
+        this.setTableData()
+      },
+      headChange (data, select,chapterList) {
+        console.log(data,select)
+        if(select.chapter){
+          select.chapter=select.chapter.toString()
+        }else {
+          let temp=[]
+          select.chapterIds='';
+          for(var item in chapterList){
+            temp.push(item);
+          }
+          select.chapterIds=temp.join(',');
+        }
+        let {chapter, subject, grade, term, diffLevelCode, knowledge: knowledgeId,chapterIds} = select
+        this.headerSelectObj = {
+          chapter, subject, grade, term, diffLevelCode, knowledgeId,chapterIds
+        }
+        this.setTableData()
+      },
+      /*
+          * 监听子组件通讯的方法
+          * 作用:ajax请求成功回调,该监听方法在libs/util 中的混合模式下定义回调
+          * @param targer string example:"add"、"edit"
+          * @param targer string 提示返回的ajax回调返回的信息改信息在对应的子组件中定义
+          * 例如:errorTitle、errorTitle
+          *addMessTitle:{
+          *    type:'add',
+          *    successTitle:'添加成功!',
+          *    errorTitle:'添加失败!',
+          *    ajaxSuccess:'ajaxSuccess',
+          *    ajaxError:'ajaxError',
+          *    ajaxParams:{
+          *      url:'/role/add',
+          *      method:'post'
+          *    }
+          *    }
+          * @param udata boolean 默认false  是否不需要刷新当前表格数据
+          * */
+      subCallback(target, title, updata) {
+        this.cancel(target);
+        if (title) {
+          this.successMess(title);
+        }
+        if (!updata) {
+          this.setTableData();
+        }
+      },
+      /********************************* 表格相关 *****************************/
+      /*
+       * 设置表格数据
+       * @param isLoading Boolean 是否加载
+       */
+      setTableData () {
+        let params = Util._.defaultsDeep({}, this.queryQptions, this.headerSelectObj, this.searchObj)
+        params.subject=this.$store.state.user.info.subject;
+        let opt = {
+          ajaxSuccess: 'listDataSuccess',
+          ajaxParams: {
+            url: api.list.path,
+            params
+          }
+        }
+        this.ajax(opt)
+      },
+      // 数据请求成功回调
+      listDataSuccess (res) {
+        this.totalCount = res.data.totalCount || 0
+        this.tableData = res.data.dataList || []
+      },
+      sortbyCall (type) {
+        if (this.searchObj.sortBy == type) {
+          if (this.searchObj.order === 'desc') {
+            this.searchObj.order = 'asc'
+          } else {
+            this.searchObj.order = 'desc'
+          }
+        } else {
+          this.searchObj.order = 'desc'
+        }
+        this.searchObj.sortBy = type
+        this.setTableData()
+      },
+      // 删除
+      remove (item) {
+        this.operailityData = [item]
+        this.openModel('remove')
+      },
+      /********************************* 弹窗相关 *****************************/
+      // 取消
+      cancel (targer) {
+        this[targer + 'Modal'] = false
+      },
+      // 弹窗回调
+      subCallback (target, title, updata) {
+        this.cancel(target)
+        if (title) {
+          this.successMess(title)
+        }
+        if (!updata) {
+          this.setTableData()
+        }
+      },
+      /*
+       * 打开指定的模态窗体
+       * @param options string 当前指定的模态:"add"、"edit"
+       * */
+      openModel (options) {
+        this[options + 'Modal'] = true
+      },
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+    },
+    components: {
+      subjectType,toChannel
+    }
+  }
+
+</script>
+<style lang="scss">
+    .vertical-center-modal-deleteQue{
+        #removeId{
+            font-size: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .remove{
+            text-align: center;
+            font-size: 14px !important;
+        }
+        .orange{
+            background-color: #11a63f !important;
+            border: none;
+        }
+    }
+
+</style>

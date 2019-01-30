@@ -1,0 +1,14 @@
+.createPaperManual {
+  .selectHeadItem {
+    margin-right: 20px;
+    line-height: 32px;
+    cursor: pointer;
+    &.active {
+      color: #fd7416;
+    }
+  }
+  .questionTypeItemName {
+    margin-right: 20px;
+    line-height: 32px;
+  }
+}

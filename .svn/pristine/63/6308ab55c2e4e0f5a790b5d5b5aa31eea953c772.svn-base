@@ -1,0 +1,100 @@
+.questionBank {
+  width: 100%;
+  background-color: #fff;
+  font-size: 14px;
+  .type {
+    padding: 40px 30px 0 30px;
+    border-bottom: 2px solid #11a63f;
+    margin-top: 1px;
+    li {
+      width: 295px;
+      float: left;
+      cursor: pointer;
+      background: #f5f5f5;
+      margin-bottom: -2px;
+      text-align: center;
+      line-height: 44px;
+    }
+    .active {
+      background: #11a63f;
+      color: #ffffff;
+      border-radius: 3px 3px 0 0;
+    }
+  }
+  .list-wrap {
+    width: 890px;
+    min-height: 510px;
+    margin: 0 auto;
+    .cs_moudle-head p {
+      padding-left: 0;
+    }
+  }
+  .status-type {
+    padding-top: 6px;
+    margin-top: 20px;
+
+    background-color: #f5f5f5;
+    border-bottom: 1px solid #c9c9c9;
+    .btn {
+      padding: 6px 20px;
+      display: inline-block;
+      border: 1px solid #f5f5f5;
+      border-bottom-color: #c9c9c9;
+      cursor: pointer;
+      &.active {
+        position: relative;
+        background-color: #fff;
+        border-color: #c9c9c9;
+        border-bottom: none;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        &:before {
+          content: ' ';
+          position: absolute;
+          left: 0;
+          bottom: -1px;
+          width: 100%;
+          height: 1px;
+          background-color: #fff;
+        }
+      }
+    }
+    .navBtns {
+      height: 35px;
+      margin-bottom: -1px;
+      padding-left: 10px
+    }
+    .todoBtns {
+      padding: 3px 6px 0;
+      padding-top: 0;
+    }
+  }
+  .filterBox {
+    padding: 10px 10px 0;
+  }
+  .orderBox {
+    height: 40px;
+    line-height: 40px;
+    padding-right: 10px;
+    border-bottom: 1px solid #e5e5e5;
+    span {
+      margin-left: 10px;
+      cursor: pointer;
+      &.active {
+        color: #fd7416;
+      }
+    }
+  }
+}
+
+.editForm {
+  .el-date-editor.el-input {
+    width: 100%;
+  }
+  .el-select {
+    width: 100%;
+    .el-input {
+      width: 100%;
+    }
+  }
+}

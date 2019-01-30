@@ -1,0 +1,680 @@
+<!--
+****--@file     slefData.vue
+****--@date     2017/12/25 9:29
+****--@author   王恒
+****--@describe  个人资料
+-->
+
+<template>
+    <div class="selfData-root">
+        <el-tabs  type="card" v-model="activeName"  @tab-click="handleClick">
+            <el-tab-pane label="基本资料" name="first">
+                <el-upload
+                        class="avatar-uploader  base-change"
+                        :show-file-list="false"
+                        action="/api/teacher/file/uploadImg"
+                        :data="formImg"
+                        :on-success="handleAvatarSuccess"
+                        :before-upload="beforeAvatarUpload">
+                    <div class="showdow">修改头像</div>
+
+                    <img  :src="ruleForm.icon" :onerror="onerrImg" class="avatar">
+                    <!--<i class="el-icon-plus avatar-uploader-icon"></i>-->
+                </el-upload>
+                <div style="clear: both"></div>
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="base-introduce">
+                    <el-form-item label="账号" prop="account">
+                        <el-input disabled="disabled" v-model="ruleForm.account" style="width: 180px"></el-input>
+                    </el-form-item>
+                    <!--<el-form-item label="昵称" prop="nickname">-->
+                    <!--<el-input v-model="ruleForm.nickname" style="width: 180px"></el-input>-->
+                    <!--</el-form-item>-->
+                    <el-form-item label="真实姓名" prop="name">
+                        <el-input v-model="ruleForm.name" style="width: 180px"></el-input>
+                    </el-form-item>
+                    <el-form-item label="性别" prop="sex">
+                        <el-checkbox-group v-model="ruleForm.sex">
+                            <div style="float: left" @click="selectsex(0)">
+                                <img v-if="slectSex!=0" src="../../assets/images/selfdata (2).gif"/>
+                                <img v-if="slectSex==0" src="../../assets/images/selfdata (4).gif"/>
+                            </div>
+                            <span style="float: left;font-size: 14px;padding: 0px 10px;">男</span>
+                            <div style="float: left" @click="selectsex(1)">
+                                <img v-if="slectSex!=1" src="../../assets/images/selfdata (3).gif"/><img
+                                    v-if="slectSex==1"
+                                    src="../../assets/images/selfdata (5).gif"/>
+                            </div>
+                            <span style="float: left;width: 20px;color: #434343;font-size: 14px;padding: 0px 10px;">女</span>
+                        </el-checkbox-group>
+                    </el-form-item>
+                    <el-form-item label="生日" prop="birth">
+                        <div class="block" style="float: left">
+
+                            <el-date-picker
+                                    v-model="day"
+                                    type="date"
+                                    placeholder="选择日期"
+                                    format="yyyy 年 MM 月 dd 日"
+                                    value-format="yyyy-MM-dd"
+                                    :picker-options="pickerOptions0">
+                            </el-date-picker>
+                            <span class="demonstration">日</span>
+                        </div>
+
+                    </el-form-item>
+                    <el-form-item label="任教学科:" prop="subject">
+                        <el-select v-model="subject" placeholder="请选择" disabled
+                                   style="width: 130px">
+                            <el-option v-for="item in subjectList" :key='item.code' :value='item.code'
+                                       :label='item.value'>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="使用教材:" prop="textbookVersionId">
+                        <el-select v-model="textbookVersionId" placeholder="请选择"
+                                   style="width: 130px">
+                            <el-option
+                                    v-for="(item,index) in textbookVersionList"
+                                    :key="item.index"
+                                    :label="item.name"
+                                    :value="item.textbookVersionId">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="资格证编号" prop="teachCertNo">
+                        <el-input disabled="disabled" v-model="ruleForm.teachCertNo" style="width:350px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="资格种类" prop="types">
+                        <el-select v-model="ruleForm.types" style="width:350px;">
+                            <el-option :value=0 label="小学老师"></el-option>
+                            <el-option :value=1 label="初中老师"></el-option>
+                            <el-option :value=2 label="高中老师"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="毕业学校" prop="school">
+                        <el-input v-model="ruleForm.school" style="width:350px;"></el-input>
+                    </el-form-item>
+                    <el-form-item label="学历" prop="degree">
+                        <el-select v-model="ruleForm.degree" style="width:350px;">
+                            <el-option value='专科' label="专科"></el-option>
+                            <el-option value='本科' label="本科"></el-option>
+                            <el-option value='硕士' label="硕士"></el-option>
+                            <el-option value='研究生' label="研究生"></el-option>
+                        </el-select>
+                    </el-form-item>
+
+                </el-form>
+                <el-form>
+                    <el-button class="greenButton" type="primary" @click="deserve('ruleForm')">保存</el-button>
+
+                </el-form>
+
+            </el-tab-pane>
+            <el-tab-pane label="账户安全" name="second">
+
+                <div class="safeAccount" v-if="passwordTochange==1">
+
+                    <div class="" style="border-bottom: 1px solid #ccc;padding-bottom: 5px;margin-bottom: 5px">
+                    <div class="na">账号</div>
+                    <span>{{ruleForm.account}}</span><br>
+                    </div>
+                    <div>
+                        <div class="na">密码</div>
+                        <span>**********</span>
+                        <button class="change whiteButton" @click="changPassword">修改</button>
+                    </div>
+
+                    <div class="p">
+                        <div class="na">手机号</div>
+                        <span v-if="ruleForm.mobile">{{ruleForm.mobile}}</span>
+                        <span v-if="!ruleForm.mobile">未绑定</span>
+                        <button class="change relative orangeYellow" @click="changTel" v-if="!ruleForm.mobile">绑定</button>
+                        <button class="change whiteButton" @click="changTel" v-if="ruleForm.mobile">修改</button>
+                    </div>
+                    <div class="p">
+                        <div class="na">微信号</div>
+                        <span v-if="ruleForm.wechat">已绑定</span><span
+                            v-if="!ruleForm.wechat">未绑定</span>
+                        <button class="change relative orangeYellow" v-if="ruleForm.wechat==''||ruleForm.wechat==null"
+                                @click="linkWechat">绑定
+                        </button>
+                    </div>
+                    <div class="p pBottom">
+
+                        <div class="na">QQ号</div>
+                        <span v-if="ruleForm.qq!=''&&ruleForm.qq!=null">{{ruleForm.qq}}</span><span
+                            v-if="ruleForm.qq==''||ruleForm.qq==null">未绑定</span>
+                        <button class="change relative" v-if="ruleForm.qq==''||ruleForm.qq==null">
+                            绑定
+                        </button>
+                        <!--<button class="change relative" v-if="!alreadyLinkqq" @click="linkqq">绑定</button>-->
+                        <!--<button class="change" v-if="alreadyLinkqq" @click="unlinkqq">解绑</button>-->
+                    </div>
+                </div>
+                <div v-if="passwordTochange==2">
+                    <el-form style="text-align: left" :model="ruleFormSafe" ref="ruleFormSafe" label-width="100px"
+                             class="base-ruleFormSafe">
+                        <el-form-item label="原密码" prop="oldPassword">
+                            <el-input type="password" v-model="ruleFormSafe.oldPassword"
+                                      style="width: 180px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="新密码" prop="newPassword">
+                            <el-input type="password" v-model="ruleFormSafe.newPassword"
+                                      style="width: 180px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="再次输入" prop="pardonInput">
+                            <el-input type="password" v-model="ruleFormSafe.pardonInput"
+                                      style="width: 180px"></el-input>
+                        </el-form-item>
+                    </el-form>
+                    <div style="text-align:center">
+                        <button class="submit-deserve greenButton" @click="surePassword">确认</button>
+                        <button class="submit-deserve greenButton" @click="surePasswordCancle">取消</button>
+                    </div>
+
+                </div>
+                <!--修改手机-->
+                <div v-if="passwordTochange==3">
+                    <el-form style="text-align: left" :model="ruleFormTel" ref="ruleFormTel" label-width="100px"
+                             class="base-ruleFormSafe">
+                        <el-form-item label="手机号码" prop="password">
+                            <el-input v-model="ruleFormTel.mobile" style="width: 180px"></el-input>
+                        </el-form-item>
+                        <el-form-item label="验证码" prop="newPassword">
+                            <el-input type="password" v-model="ruleFormTel.word" style="width: 180px"
+                                      placeholder="6位数字"></el-input>
+                            <div @click="accessKey1" v-if="!sendKeySuccess" class="accessWord orangeYellow">
+                                获取验证码
+                            </div>
+                            <div v-if="sendKeySuccess" class="accessWord orangeYellow">
+                                已发送<span style="padding-left:5px">{{timesend}}</span>s
+                            </div>
+
+                        </el-form-item>
+
+                    </el-form>
+                    <div style="text-align: center">
+                        <button class="submit-deserve greenButton" @click="sureTel">确认</button>
+                        <button class="submit-deserve  greenButton" @click="sureTelCancel">取消</button>
+                    </div>
+                </div>
+                <div v-if="passwordTochange==4">
+                    <i class="el-icon-close" style="float: right" @click="passwordTochange=1"></i>
+                    <h1 class="wechatLogin">微信登录</h1>
+                    　　<img src="../../assets/images/ewm.png"/>
+                    <p> 请使用微信扫描二维码登录</p>
+
+                </div>
+            </el-tab-pane>
+
+        </el-tabs>
+
+        <Modal
+                :mask-closable="false"
+                width="360"
+                title="密码修改"
+                v-model="passwordChange"
+                class-name="selectBook-con sureChange" :loading="loading">
+            <modal-header slot="header" :content="passwordChangeId"></modal-header>
+            <password-change v-if="passwordChange"></password-change>
+        </Modal>
+        <Modal
+                :mask-closable="false"
+                width="360"
+                title="电话修改"
+                v-model="telChange"
+                class-name="selectBook-con sureChange" :loading="loading">
+            <modal-header slot="header" :content="telChangeId"></modal-header>
+
+            <telChange v-if="telChange" :content1="content1"></telChange>
+        </Modal>
+
+    </div>
+
+</template>
+<script>
+
+
+  import telChange from './components/telChange.vue'
+  import selectPlace from '../../components/common/distpicker/index.vue'
+  import passwordChange from './components/passwordChange.vue'
+  import { makeQuestion as rules } from './rules'
+  //import
+  import api from './api'
+
+  let Util = null
+  export default {
+    data () {
+      return {
+        subjectList: [],
+        textbookVersionList: [],
+        self: this,
+        imgsrcdetail: '',
+        onerrImg: '',
+        gradeList: [],
+        formImg: {},
+        imageUrl: '',
+        timesend: 60,
+        sendKeySuccess: false,
+        rules,
+        activeName: 'first',
+        slectSex: 0,
+        passwordTochange: 1,
+        loading: false,
+        passwordChange: false,
+        telChange: false,
+        telChangeId: {
+          id: 'telChangeId',
+          title: '',
+        },
+        passwordChangeId: {
+          id: 'passwordChangeId',
+          title: '',
+        },
+        bookBtn: [],
+        ruleForm: {
+          account: '',
+          name: '',
+          sex: 1,
+          birth: '',
+          teachCertNo: '',
+          types: '',
+          degree: '',
+
+          textbookVersionList: [{textbookVersionId: '', subject: ''}],
+
+          school: '',
+          icon: '',
+          ordId: ''
+        },
+        textbookVersionId: '',
+        subject: '',
+        ruleFormSafe: {
+          oldPassword: '',
+          newPassword: '',
+          pardonInput: '',
+        },
+        ruleFormTel: {
+          mobile: '',
+          word: '',
+        },
+        formValidate: {},
+        selectDiv: '',
+        alreadyLinkqq: false,
+        alreadyLinkWechat: false,
+        wechatLink: '未绑定',
+        qqLink: '12345678',
+        imgList: [],
+        imgsrcList: [],
+        day: '',
+        textbookVersionList: [],
+        subject: '',
+        imgpath: '',
+        numoftype: '',
+        pickerOptions0: {
+          disabledDate (time) {
+            return time.getTime() > Date.now() - 8.64e6
+          }
+        },
+        content1: ''
+      }
+    },
+    created () {
+      if(this.$route.query.openId){
+        this.ajax({
+          ajaxSuccess: res => {
+            this.successMess('绑定成功')
+            this.init();
+          },
+          ajaxParams: {
+            url: 'wxConnect/bound',
+            method: 'post',
+            data: {
+              openId:this.$route.query.openId,
+              username:this.$store.state.user.info.account,
+            }
+          }
+        })
+      }else {
+        this.init();
+      }
+
+    },
+    mounted () {
+    },
+    methods: {
+      //选择市区
+      selected (res) {
+        this.area = res.area.value
+        this.city = res.city.value
+        this.province = res.province.value
+      },
+
+      //上传图片
+      handleAvatarSuccess (res, file) {
+
+        this.ruleForm.icon = URL.createObjectURL(file.raw)
+
+        //this.ruleForm.icon = this.getStaticPath(res.data.dataList);
+        this.imgsrcdetail = res.data
+        // this.ruleForm.icon=res.data.dataList;
+      },
+      beforeAvatarUpload (file) {
+        this.formImg = {file: file, mini: false}
+
+        const isLt2M = file.size / 1024 / 1024 < 10
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 10MB!')
+        }
+        return isLt2M
+      },
+      init () {
+        Util = this.$util
+        // this.gradeList=this.$store.getters['app/envs']('gradeList')||[];
+        this.ajax({//获取个人信息
+          ajaxSuccess: this.RightSend,
+          ajaxParams: {
+            url: api.getMyInfo.path,
+            params: {},
+          },
+        })
+        this.subjectList = this.$store.state.app.envs.gradeMap[11]
+        //this.textbookVersionList = this.$store.state.app.envs.textBookVersionList
+
+      },
+      queryTextbookVersion(){//获取教材版本
+        this.ajax({
+          ajaxSuccess: (res)=>{ this.textbookVersionList=res.data.dataList},
+          ajaxParams: {
+            //baseURL:'PUBLIC',
+            url: api.queryTextbookVersion.path,
+            method: api.queryTextbookVersion.method,
+            params:{
+              subject:this.subject
+            }
+          },
+        })
+      },
+      RightSend (res) {
+        console.log(res.data)
+        this.ruleForm = res.data
+        this.imgsrcdetail = this.ruleForm.icon
+        this.ruleForm.icon = this.getStaticPath(this.ruleForm.icon)||'ttt';
+        this.slectSex = this.ruleForm.sex||0;
+        if (this.ruleForm.textbookVersionList[0]) {
+          this.textbookVersionId = this.ruleForm.textbookVersionList[0].textbookVersionId
+          this.subject = this.ruleForm.textbookVersionList[0].subject;
+          this.queryTextbookVersion();
+        } else {
+          this.ruleForm.textbookVersionList = [{textbookVersionId: '', subject: ''}]
+          this.textbookVersionId = ''
+          this.subject = ''
+        }
+
+        if (res.data.birth) {
+          var date = this.conductDate(res.data.birth).split('-')
+          this.day = date[0] + '-' + date[1] + '-' + date[2]
+        }
+        if (this.$store.state.user.info.sex == 1) {//照片替换
+          this.onerrImg = 'this.src="' + require('../../assets/images/woman.png') + '"'
+
+        } else {
+          console.log(1)
+          this.onerrImg = 'this.src="' + require('../../assets/images/man.png') + '"'
+        }
+      },//请求图片列表
+      reqImgList (i) {
+        this.ajax({
+          ajaxSuccess: this.getListimgsuccess,
+          ajaxParams: {
+            // baseURL: "MANAGER",
+            url: api.getBooklist.path,
+            method: api.getBooklist.method,
+            params: {
+              id: i
+            },
+          },
+        })
+      },
+
+      getListimgsuccess () {
+        // this.imgsrcList.push()
+
+      },
+      linkWechat () {
+        //this.alreadyLinkWechat = true
+        window.location.href='http://192.168.1.236:9901/api/teacher/wxConnect/getOAuthCodeBinding';
+
+      },
+      unlinkWechat () {
+        this.alreadyLinkWechat = false
+      },
+      unlinkqq () {
+        this.alreadyLinkqq = false
+      },
+      linkqq () {
+        this.alreadyLinkqq = true
+      },
+      handleClick (tab, event) {
+        this.passwordTochange = 1
+        this.ruleFormSafe = {
+          oldPassword: '',
+          newPassword: '',
+          pardonInput: '',
+        }
+        this.ruleFormTel = {
+          mobile: '',
+          word: '',
+        }
+      },
+      selectsex (index) {
+
+        this.ruleForm.sex = index
+
+        this.slectSex = index
+      },
+      changPassword () {
+        this.passwordTochange = 2
+      },
+      changTel () {
+        this.passwordTochange = 3
+      },
+      surePasswordCancle () {
+        this.passwordTochange = 1
+      },
+      surePassword () {
+        if (this.ruleFormSafe.newPassword !== this.ruleFormSafe.pardonInput) {
+          this.$message({
+            showClose: true,
+            message: '两次密码输入不一致',
+            type: 'error'
+          })
+        } else {
+          this.ajax({
+            ajaxSuccess: this.changePassword,
+            error: () => {
+            },
+            ajaxParams: {
+              // baseURL: "MANAGER",
+              url: api.changePass.path,
+              method: api.changePass.method,
+              data: {
+                oldPassword: this.ruleFormSafe.oldPassword,
+                newPassword: this.ruleFormSafe.newPassword,
+              },
+            },
+          })
+        }
+
+      },
+      changePassword () {
+        this.passwordTochange = 1
+        this.passwordChange =true
+      },
+      sureTel () {//bindMobile
+        if (this.ruleFormTel.word.length != 6) {
+          this.$message({
+            showClose: true,
+            message: '请输入6位验证码',
+            type: 'error'
+          })
+          return false
+        }
+        if (!(/^1[34578]\d{9}$/.test(this.ruleFormTel.mobile))) {
+          this.$message({
+            showClose: true,
+            message: '请输入正确的手机号码',
+            type: 'error'
+          })
+          return false
+        }
+        this.RightSendKey()
+      },
+      nameAndMoblie () {
+        this.ajax({
+          ajaxSuccess: this.getPassTelSuccess, //获取成功变换发送短信按钮
+          ajaxParams: {
+            //baseURL:'PUBLIC',
+            url: api.sendValidCode.path,
+            method: api.sendValidCode.method,
+            data: {
+              mobile: this.ruleFormTel.mobile,
+              types: '30'//修改绑定手机号码
+            },
+          },
+        })
+      },
+      RightSendKey () {//修改手机号
+        this.ajax({
+          ajaxSuccess: this.Telchangesuccess,
+          error: () => {
+          },
+          ajaxParams: {
+            //baseURL: "MANAGER",
+            url: api.bindMobile.path,
+            method: api.bindMobile.method,
+            data: {
+              mobile: this.ruleFormTel.mobile,
+              code: this.ruleFormTel.word,
+
+            },
+          },
+        })
+      },
+      Telchangesuccess () {
+        this.ruleForm.mobile = this.ruleFormTel.mobile
+        this.content1 = this.ruleForm.mobile
+        this.ruleFormTel = {}
+        this.passwordTochange = 1
+        this.telChange = 1
+
+      },
+      sureTelCancel () {
+        this.passwordTochange = 1
+
+      },
+      accessKey1 () {//获取验证码
+        if (!(/^1[34578]\d{9}$/.test(this.ruleFormTel.mobile))) {
+          this.$message({
+            showClose: true,
+            message: '请输入正确的手机号码',
+            type: 'error'
+          })
+
+        } else {
+          this.nameAndMoblie()
+
+        }
+      },
+      getPassTelSuccess (res) {
+        var that = this
+        var setInt = window.setInterval(function () {
+          that.timesend--
+          if (that.timesend == 0) {
+            window.clearInterval(setInt)
+            that.sendKeySuccess = false
+            that.timesend = 60
+          }
+        }, 1000)
+        this.sendKeySuccess = true
+        return
+      },//修改
+      deserve (formName) {
+        this.ruleForm.birth = this.day
+        this.ruleForm.subject = this.subject
+        this.ruleForm.textbookVersionList[0].subject = this.subject
+        this.ruleForm.textbookVersionList[0].textbookVersionId = this.textbookVersionId
+        this.ruleForm.icon = this.imgsrcdetail
+        console.log(1)
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.ajax({
+              ajaxSuccess: this.changeMydataSuccess,
+              ajaxParams: {
+                //baseURL:'PUBLIC',
+                jsonString: true,
+                url: api.modify1.path,
+                method: api.modify1.method,
+                data: this.ruleForm
+              }
+            })
+          } else {
+            return false
+          }
+        })
+
+      },
+      /*
+      * 获取表单数据
+      * @return string  格式:id=0&name=aa
+      * */
+      getFormData (data) {
+        let myData = Util._.defaultsDeep({}, data)
+        return myData
+      },
+      changeMydataSuccess () {
+        this.$message({
+          showClose: true,
+          message: '信息修改成功',
+          type: 'success'
+        })
+        // 修改资料后重新获取当前用户的资料
+        this.getMyInfo ()
+      },
+      getMyInfo () {
+        let opt = {
+          ajaxSuccess: res => {
+            if (res.data instanceof Object) {
+              this.$store.commit('user/updateInfo', res.data)
+              this.init();
+              // this.$store.commit('user/updateTextbookVersionList', res.data.textbookVersionList)
+            }
+
+          },
+          ajaxParams: {
+            url: '/getMyInfo'
+          }
+        }
+        this.ajax(opt)
+      },
+
+    },
+    components: {
+      telChange,
+      selectPlace,
+      passwordChange
+    },
+
+  }
+
+</script>
+<style lang="scss">
+    /*@import "../css/selfData.scss";*/
+    @import "../css/selfData";
+
+    .avatar {
+        width: 100px;
+        height: 100px;
+        display: block;
+    }
+</style>

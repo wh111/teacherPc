@@ -1,0 +1,531 @@
+<!--
+****--@file     startCorrectedTest.vue
+****--@date     2018/4/4 14:39
+****--@author   ${王恒}
+****--@describe   批改测试
+-->
+<template>
+    <div class="showHaveCorrected-root">
+        <h1>{{viewData.name}} </h1>
+        <el-row style="border-bottom: 1px solid #D9E0E2;">
+            <div class="rightTitle">
+                <div class="status yellow">
+                    未批改
+                </div>
+                <div class="status">
+                    <b>{{viewData.score||0}}分</b>
+                </div>
+            </div>
+            <div class="img">
+                <user-img :wh="52" :src="viewData.icon"></user-img>
+            </div>
+            <span class="name">{{viewData.studentName}}</span>
+            <!--<p class="p"> {{viewData.studentName}}<span style="float: right">(未批改){{viewData.totalScore}}分</span></p>-->
+        </el-row>
+        <el-row style="line-height: 30px">
+            <el-col :span='12'>
+                试卷共{{viewData.questionNums}}题，考生共答{{viewData.studentAnswerNum || 0}}题
+            </el-col>
+            <el-col :span='6'>
+                用时：{{(viewData.usedTime / 60 || 0).toFixed(0)}}分钟{{(viewData.usedTime % 60)}}秒
+            </el-col>
+            <el-col :span='6'>
+                <span style="float: right">正确率：{{parseInt(viewData.correctRate)}}%</span>
+            </el-col>
+        </el-row>
+        <!-- 试卷结构 -->
+        <div class="paperBody">
+            <template v-for="(item,questionsTypeId) in viewData.questionsList">
+                <question-show
+                        :key="questionsTypeId"
+                        :index="questionsTypeId+1"
+                        :showData="item"
+                        :showScore="true"
+                        :show-answer="true"
+                        answerDo="7"
+                >
+                    <!--<template slot="todoBox">-->
+                        <!--<div class="qsTodoBox" align="right">-->
+                            <!--<div class="qstdInfo">-->
+                                <!--&lt;!&ndash;<p class="qstdiItem">难度：{{ item.diffLevelCode |&ndash;&gt;-->
+                                <!--&lt;!&ndash;diffLevelCode(self) }}</p>&ndash;&gt;-->
+                                <!--<p class="qstdiItem">难度：{{ item.diffLevel }}</p>-->
+                                <!--<p class="qstdiItem">分值：{{ item.score }}分</p>-->
+                            <!--</div>-->
+                            <!--<el-checkbox :value="item.id" :label="item.id">{{ }}</el-checkbox>-->
+                        <!--</div>-->
+                    <!--</template>-->
+                    <!--<template v-if="item.groups">-->
+                        <!--<template v-for="(itemChild,index) in item.childQuestionsList" :slot="'answerRight'+itemChild.id">-->
+                            <!--<template v-if="!['Answer','Input'].includes(itemChild.basicType)">-->
+                                <!--<div class="qstdInfo">-->
+                                    <!--&lt;!&ndash;<p class="qstdiItem">难度：{{ item.diffLevelCode |&ndash;&gt;-->
+                                    <!--&lt;!&ndash;diffLevelCode(self) }}</p>&ndash;&gt;-->
+                                    <!--<p class="qstdiItem">难度：{{itemChild.diffLevel}}</p>-->
+                                    <!--<p class="qstdiItem">分值：{{itemChild.studentScore}} / {{itemChild.score}}分</p>-->
+                                <!--</div>-->
+
+                                <!--&lt;!&ndash;<span style="margin-right: 10px">难度：{{itemChild.diffLevel}} </span>&ndash;&gt;-->
+                                <!--&lt;!&ndash;{{itemChild.studentScore}} / {{itemChild.score}}分&ndash;&gt;-->
+                            <!--</template>-->
+                            <!--<template v-else>-->
+                                <!--<div :key="itemChild.id">-->
+                                    <!--<span style="margin-right: 10px">难度：{{itemChild.diffLevel}} </span>-->
+                                    <!--<el-input style="width: 22%" v-model="itemChild.studentScore" slot="todoBox"-->
+                                              <!--type="number"/>-->
+                                    <!--<span style="color:#fd7416;"> / {{itemChild.score}}</span>-->
+                                    <!--<el-button @click="correct(itemChild,questionsTypeId,'child',index)">打分</el-button>-->
+                                <!--</div>-->
+                            <!--</template>-->
+                        <!--</template>-->
+
+                    <!--</template>-->
+                    <!--<template v-else slot="answerRight">-->
+                        <!--<template v-if="!['Answer','Input'].includes(item.basicType)">-->
+                            <!--<div class="qstdInfo">-->
+                                <!--&lt;!&ndash;<p class="qstdiItem">难度：{{ item.diffLevelCode |&ndash;&gt;-->
+                                <!--&lt;!&ndash;diffLevelCode(self) }}</p>&ndash;&gt;-->
+                                <!--<p class="qstdiItem">难度：{{item.diffLevel}}</p>-->
+                                <!--<p class="qstdiItem">分值：{{item.studentScore}} / {{item.score}}分</p>-->
+                            <!--</div>-->
+                            <!--&lt;!&ndash;<span style="margin-right: 10px">难度：{{item.diffLevel}} </span>&ndash;&gt;-->
+                            <!--&lt;!&ndash;{{item.studentScore}} / {{item.score}}分&ndash;&gt;-->
+                        <!--</template>-->
+                        <!--<template v-else>-->
+                            <!--<span style="margin-right: 10px">难度：{{item.diffLevel}} </span>-->
+                            <!--<el-input style="width: 22%" v-model="item.studentScore" slot="todoBox" type="number"/>-->
+                            <!--<span style="color:#fd7416;">/  {{item.score}}</span>-->
+                            <!--<el-button @click="correct(item,questionsTypeId,'noChild')">打分</el-button>-->
+                        <!--</template>-->
+                    <!--</template>-->
+                    <template v-if="item.groups">
+                        <template slot="title">
+                            <p class="contentTitle" @click.stop="cancelHref"><span>难度：{{item.diffLevel}}</span><span>满分：{{item.score}}</span><span
+                                    class="green">得分： {{item.studentScore}} </span></p>
+                        </template>
+                        <template v-for="(itemChild,index) in item.childQuestionsList"
+                                  :slot="'answerRight'+itemChild.id">
+                            <template v-if="!['Answer','Input'].includes(itemChild.basicType)">
+                                <template>
+                                    <p class="contentTitleRight" @click.stop="cancelHref">
+                                        <span>难度：{{itemChild.diffLevel}}</span><span>满分：{{itemChild.score}}</span><span
+                                            class="green">得分： {{itemChild.studentScore}} </span></p>
+                                </template>
+                            </template>
+                            <template v-else>
+                                <!--<template slot="title">-->
+                                <!--<p class="contentTitle" @click.stop="cancelHref"><span>难度：{{itemChild.diffLevel}}</span><span>满分：{{itemChild.score}}</span><span class="green">得分： {{itemChild.studentScore}}<span class="pen"><i class="el-icon-edit"></i></span> </span></p>-->
+                                <!--</template>-->
+                                <!--<div :key="itemChild.id">-->
+                                <!--<span style="margin-right: 10px">难度：{{itemChild.diffLevel}} </span>-->
+                                <!--<el-input style="width: 22%" v-model="itemChild.studentScore" slot="todoBox"-->
+                                <!--type="number"/>-->
+                                <!--<span style="color:#fd7416;"> / {{itemChild.score}}</span>-->
+                                <!--<el-button @click="correct(itemChild,questionsTypeId,'child',index)">打分</el-button>-->
+                                <!--</div>-->
+                                <div class="contentTitle contentTitleRight" @click.stop="cancelHref">
+                                    <span>难度：{{itemChild.diffLevel}}</span><span>满分：{{itemChild.score}}</span><span
+                                        class="green">得分： {{itemChild.studentScore}}<span class="pen"
+                                                                                          @click.stop="showCorrect(itemChild)"><i
+                                        class="el-icon-edit"></i>
+                                         <div class="buttonContent" v-show="show&&itemChild.show" @click.stop="cancelHref">
+                                          <el-input class="input" v-model="itemChild.studentScore"></el-input>
+                                          <el-button class="greenButton button"
+                                                     @click="correct(itemChild,questionsTypeId,'child',index)">确定</el-button>
+                                        </div>
+                                </span> </span>
+
+                                </div>
+
+                            </template>
+                        </template>
+
+                    </template>
+                    <template v-else>
+                        <template v-if="!['Answer','Input'].includes(item.basicType)">
+                            <template slot="title">
+                                <p class="contentTitle"  @click.stop="cancelHref">
+                                <span>难度：{{item.diffLevel}}</span><span>满分：{{item.score}}</span><span class="green">得分： {{item.studentScore}}</span>
+                                </p>
+                            </template>
+                        </template>
+                        <template v-else>
+                            <template slot="title">
+                                <div class="contentTitle" @click.stop="cancelHref">
+                                    <span>难度：{{item.diffLevel}}</span>
+                                    <span>满分：{{item.score}}</span>
+                                    <span class="green">得分： {{item.studentScore}}</span>
+                                    <span class="pen" @click.stop="showCorrect(item)">
+                                        <i class="el-icon-edit"></i>
+                                    </span>
+                                    <div class="buttonContent" v-if="show&&item.show">
+                                        <el-input class="input" v-model="item.studentScore"></el-input>
+                                        <el-button class="greenButton button"
+                                                   @click="correct(item,questionsTypeId,'noChild')">确定
+                                        </el-button>
+                                    </div>
+                                </div>
+
+                            </template>
+                            <!--<span style="margin-right: 10px">难度：{{item.diffLevel}} </span>-->
+                            <!--<el-input style="width: 22%" v-model="item.studentScore" slot="todoBox" type="number"/>-->
+                            <!--<span style="color:#fd7416;">/  {{item.score}}</span>-->
+                            <!--<el-button @click="correct(item,questionsTypeId,'noChild')">打分</el-button>-->
+                        </template>
+                        <template slot="answerRight">
+                            <span></span>
+                        </template>
+                    </template>
+
+                </question-show>
+            </template>
+            <div style="text-align: center">
+                <el-button @click="allComplete">批改完成 </el-button>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+  import userImg from '../../../components/common/userHeadImg.vue'
+  import questionShow from '../../../components/questionShow/show.vue'
+  import api from '../api'
+  //当前组件引入全局的util
+  let Util = null
+  export default {
+    name: 'showHaveCorrected',
+    props: ['id', 'studentId'],
+    data () {
+      return {
+        viewData: {},
+        question: {questionsId: '', score: ''},
+        questionData: {
+          questionsId: '',
+          score: '',
+          teacherOpinion: '',
+          answerResult: '',
+        },
+        show:false,
+        showItem:null,
+      }
+    },
+    methods: {
+      cancelHref(){
+
+      },
+      showCorrect (item) {
+
+        this.show=!this.show;
+        if(item!=this.showItem){
+          console.log(1)
+            this.show=true;
+            this.showItem=item;
+        }
+        this.viewData.questionsList.map((data) => {
+          if (data.groups) {
+            data.childQuestionsList.map((childItem) => {
+              childItem.show = false
+            })
+          } else {
+            data.show = false
+          }
+        })
+        item.show = this.show;
+        console.log(item.show,this.show)
+      },
+      allComplete () {//全部批改
+        let temp = true
+        console.log(this.viewData.questionsList)
+        this.viewData.questionsList.map((item) => {
+          console.log(item.groups)
+          if(item.childQuestionsList){
+            item.childQuestionsList.map((childItem)=>{
+              if (childItem.isCorrecting == 0 && ['Input','Answer'].includes(childItem.basicType)){
+                this.errorMess('还有未批改的题，请批改完成点击提交')
+                console.log(childItem)
+                temp = false
+                return false
+              }
+            })
+          }else {
+
+            if (item.isCorrecting == 0 && ['Input','Answer'].includes(item.basicType)){
+              this.errorMess('还有未批改的题，请批改完成点击提交')
+              console.log(item)
+              temp = false
+              return false
+            }
+          }
+        })
+        if (!temp) {
+          return false
+        }
+        this.ajax({
+          ajaxSuccess: () => {
+            this.successMess('提交成功')
+            this.$emit('reResquest')
+          },
+          ajaxParams: {
+            url: api.finishedTest.path,
+            method: api.finishedTest.method,
+            data: {
+              studentId: this.studentId,
+              papersId: this.id,
+
+            },
+          },
+        })
+      },
+      //初始化请求列表数据
+      init () {
+        this.getInfo()
+      },
+      finished () {
+        this.ajax({
+          ajaxSuccess: (res) => {this.successMess('批改成功')},
+          ajaxParams: {
+            url: api.finished.path,
+            method: api.finished.method,
+            params: {
+              workId: this.formValidate.workId,
+              studentId: this.studentId,
+              groupsId: this.viewData.groupsId,
+            }
+          },
+        })
+      },
+      getInfo () {
+        this.ajax({
+          ajaxSuccess: (res) => {
+            this.viewData = res.data
+            if (this.viewData.icon) {this.viewData.icon = this.getStaticPath(this.viewData.icon)}
+            this.viewData.questionsList.map((item,index) => {
+              item.middle = item.studentScore;
+              if(item.childQuestionsList){
+                item.score=0;
+                item.studentScore=0;
+                item.childQuestionsList.map((itemChildren, index1) => {
+                  item.score+=itemChildren.score;
+                  item.studentScore+=itemChildren.studentScore
+                  itemChildren.middle= itemChildren.studentScore;
+                })
+              }
+              this.viewData.questionsList.map((item) => {item.middle = (item.studentScore || 0)})
+            })
+          },
+          ajaxParams: {
+            url: api.getCorrect.path,
+            method: api.getCorrect.method,
+            params: {
+              id: this.id,
+              studentId: this.studentId
+            },
+          },
+        })
+      },//老师批改测评(主观题批改)
+      correct (val, index,type,childrenIndex) {//
+//        val.studentScore=this.studentScoreNull;
+        this.questionData.questionsId = val.id
+        this.questionData.score = val.studentScore
+        if (val.studentScore == val.score) {
+          this.questionData.answerResult = 1
+        } else {
+          this.questionData.answerResult = 0
+        }
+        console.log( this.questionData.score,val.studentScore)
+        if (val.studentScore > val.score || val.studentScore==='' || val.studentScore < 0) {
+          this.errorMess('请输入正确分值')
+          return false
+        }
+        let opt = Object.assign({
+          papersId: this.id,
+          studentId: this.studentId
+        }, this.questionData)
+        this.ajax({
+          ajaxSuccess: (res) => {
+            this.show=false;
+            console.log(this.show)
+            this.successMess('提交成功')
+            console.log(typeof (childrenIndex)=='undefined')
+            if(childrenIndex){
+              this.viewData.score += (Number(val.studentScore) - Number(this.viewData.questionsList[index].childQuestionsList[childrenIndex].middle));
+              this.viewData.questionsList[index].childQuestionsList[childrenIndex].middle=val.studentScore;
+              this.viewData.questionsList[index].childQuestionsList[childrenIndex].isCorrecting = true
+              this.viewData.questionsList[index].studentScore += (Number(val.studentScore) - Number(this.viewData.questionsList[index].childQuestionsList[childrenIndex].middle))
+            }else {
+              this.viewData.score += (Number(val.studentScore) - Number(this.viewData.questionsList[index].middle))
+              this.viewData.questionsList[index].middle = val.studentScore
+              this.viewData.questionsList[index].isCorrecting = true;
+              console.log( this.viewData.questionsList[index])
+            }
+          },
+          ajaxParams: {
+            url: api.correctEvaluation.path,
+            method: api.correctEvaluation.method,
+            data: opt,
+          },
+        })
+      },
+
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+    },
+    components: {userImg, questionShow},
+  }
+
+</script>
+<style lang="scss">
+    .showHaveCorrected-root {
+        .rightTitle {
+            float: right;
+            border: 1px solid #FD7416;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+            margin-right: 20px;
+            .status {
+                width: 80px;
+                height: 32px;
+                line-height: 32px;
+                text-align: center;
+
+                font-size: 12px;
+            }
+            .green {
+                color: #fff;
+                background: #11a63f;
+            }
+            .yellow {
+                background: #FD7416;
+                color: #fff;
+            }
+        }
+        .img {
+            float: left;
+            margin-top: 24px;
+        }
+        .name {
+            line-height: 100px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        .contentTitle {
+            height: 37px;
+            margin-top: 40px;
+            background: #ebf3f0 ;
+            line-height: 37px;
+            text-align: right;
+            position: relative;
+            span {
+                font-size: 12px;
+                color: #A0A0A0;
+                margin-right: 20px;
+            }
+            .green {
+                color: #11a63f;
+                font-weight: bold;
+            }
+            .pen {
+                color: #A0A0A0;
+                font-size: 14px;
+
+            }
+        }
+        .contentTitleRight {
+            background: #fff;
+            height: 24px;
+            line-height: 26px;
+            span {
+                font-size: 12px;
+                color: #A0A0A0;
+                margin-right: 20px;
+            }
+            .green {
+                color: #11a63f;
+                font-weight: bold;
+            }
+        }
+        .buttonContent {
+            z-index: 10;
+            background-color: #fff;
+            position: absolute;
+            right: 0;
+            bottom: -66px;
+            width: 147px;
+            height: 53px;
+            .input {
+                width: 62px;
+                height: 27px;
+
+            }
+            .button {
+                color: #fff;
+                text-align: center;
+                width: 62px;
+                span {
+                    color: #fff;
+                }
+            }
+        }
+        h1 {
+            line-height: 40px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #11a63f;
+            text-align: center;
+            border-bottom: 1px solid #D9E0E2;
+            margin-top: -20px;
+
+        }
+        .qstdInfo {
+            position: absolute;
+            top: 0;
+            right: 30px;
+            border-radius: 4px;
+            border: 1px solid #d8e0e2;
+            text-align: left;
+        }
+        .qstdiItem {
+            height: 30px;
+            line-height: 30px;
+            font-size: 12px;
+            padding: 0 6px;
+            &:first-child {
+                border-bottom: 1px solid #d8e0e2
+            }
+        }
+        h1 {
+            line-height: 40px;
+            font-size: 20px;
+            text-align: center;
+            margin-top: -20px;
+        }
+        .p {
+            margin-left: 75px;
+            height: 60px;
+            line-height: 70px;
+            span {
+                float: right;
+            }
+        }
+        .img {
+            float: left;
+        }
+        .list-content {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 14px;
+            background-color: #f5f5f5;
+            .title {
+                height: 40px;
+                line-height: 20px;
+            }
+        }
+        a {
+            color: #495060;
+        }
+    }
+</style>

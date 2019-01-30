@@ -1,0 +1,296 @@
+<!--
+****--@file     task_goon
+****--@date     2018/3/20 10:08
+****--@author   jhd
+****--@describe   开始任务
+-->
+
+<!--<template>-->
+    <!--<div class="task_goon">-->
+        <!--<div class="task-content">-->
+            <!--<div class="title"><span>任务信息</span></div>-->
+            <!--<p class="tip">-->
+                <!--<span>任务名称</span>众包组题来了-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>任务类型</span>众包组题-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>任务描述</span>-->
+                <!--<b class="tips">众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了众包组题来了</b>-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>任务时间</span>起 2017-08-09 10:00 止 2018-08-09 10:00-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>知识点</span>汉语拼音、读写-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>来源</span>系统-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>参与者</span>全部教师-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>任务奖励</span>100积分-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>或得奖励</span>100积分-->
+            <!--</p>-->
+        <!--</div>-->
+        <!--<div class="test"></div>-->
+        <!--<div class="bzst">-->
+            <!--<div class="title">-->
+                <!--<span>编制试题</span>-->
+                <!--<el-button class="right" type="warning" round>编制试题</el-button>-->
+            <!--</div>-->
+            <!--<ul class="clearfix">-->
+                <!--<li :class="index == 0 ? 'first-child item' : 'item'" v-for="(item,index) in 6" :key="index">-->
+                    <!--<p class="task-item-title">-->
+                        <!--<span class="source">试题{{index+1}} | 题型：单选题</span>-->
+                        <!--<span class="time">分值：2分</span>-->
+                    <!--</p>-->
+                    <!--<div class="task-item-content clearfix">-->
+                        <!--<div class="tip-wrap left">-->
+                            <!--&lt;!&ndash; 试题组件 &ndash;&gt;-->
+                        <!--</div>-->
+                        <!--<dd class="btn-wrap left">-->
+                            <!--<span >采纳 </span>-->
+                        <!--</dd>-->
+                    <!--</div>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</template>-->
+<template>
+    <div class="task_goon">
+        <div class="task-content">
+            <div class="title"><span>任务信息</span></div>
+            <p class="tip">
+                <span>任务名称</span>{{ viewData.name }}
+            </p>
+            <p class="tip">
+                <span>任务类型</span>{{ (viewType | taskType) ||'刷题大赛'}}
+            </p>
+            <p class="tip">
+                <span>发布者</span> {{viewData.publisherName||'全部教师'}}
+            </p>
+            <p class="tip">
+                <span>创建日期</span>
+                <b class="tips">{{ viewData.createTime  | formatDate('yyyy-MM-dd') }}</b>
+            </p>
+            <p class="tip">
+                <span>任务时间</span>起 {{ viewData.beginTime | formatDate('yyyy-MM-dd HH:mm') }} 止 {{ viewData.endTime |
+                formatDate('yyyy-MM-dd HH:mm') }}
+            </p>
+            <p class="tip">
+                <span>任务描述</span>
+                <b class="tips">{{ viewData.remark }}</b>
+            </p>
+            <p  class="tip">
+                <el-row>
+                    <el-col :span="3">
+                        <span>任务排名</span>
+                    </el-col>
+                    <el-col :span="20">
+                        <el-table
+                                :data="viewData.gameAnswerIntegralList"
+                                border
+                                style="width: 100%;margin: 10px 0 10px -10px;line-height: 30px;border-right: 1px solid #e6ebf5 !important;border-left: 1px solid #e6ebf5 !important;">
+                            <el-table-column
+                                    align="center"
+                                    prop="ranking"
+                                    label="排名"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    align="center"
+                                    prop="studentName"
+                                    label="姓名"
+                                    width="180">
+                            </el-table-column>
+                            <el-table-column
+                                    align="center"
+                                    prop="answerTtrueNum"
+                                    label="答对题数">
+                            </el-table-column>
+                            <el-table-column
+                                    align="center"
+                                    prop="integral"
+                                    label="奖励">
+                            </el-table-column>
+                        </el-table>
+                    </el-col>
+                </el-row>
+            </p>
+            <!--<p class="tip">-->
+                <!--<span>任务排名</span>-->
+                <!--<el-table-->
+                        <!--:data="tableData"-->
+                        <!--border-->
+                        <!--style="margin-left: 100px;">-->
+                    <!--<el-table-column-->
+                            <!--prop="name"-->
+                            <!--label="排名"-->
+                            <!--width="180">-->
+                    <!--</el-table-column>-->
+                    <!--<el-table-column-->
+                            <!--prop="name"-->
+                            <!--label="姓名"-->
+                            <!--width="180">-->
+                    <!--</el-table-column>-->
+                    <!--<el-table-column-->
+                            <!--prop="name"-->
+                            <!--label="答对题数">-->
+                    <!--</el-table-column>-->
+                    <!--<el-table-column-->
+                            <!--prop="name"-->
+                            <!--label="奖励">-->
+                    <!--</el-table-column>-->
+                <!--</el-table>-->
+            <!--</p>-->
+            <p class="tip">
+                <el-row>
+                    <el-col :span="3">
+                        <span>任务内容</span>
+                    </el-col>
+                    <el-col :span="20">
+                        <el-table
+                                :data="viewData.questionList"
+                                border
+                                style="width: 100%;margin: 10px 0 10px -10px;line-height: 30px;border-right: 1px solid #e6ebf5 !important;border-left: 1px solid #e6ebf5 !important;">
+                            <el-table-column
+                                    width="100"
+                                    align="center"
+                                    prop="questionId"
+                                    label="题号">
+                            </el-table-column>
+                            <el-table-column
+                                    align="center"
+                                    prop="title"
+                                    label="题目">
+                                <template  slot-scope="scope">
+                                    <p v-html="scope.row.title"></p>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-col>
+                </el-row>
+            </p>
+            <!--<p class="tip">-->
+                <!--<span>来源</span>系统-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>任务奖励</span>100积分-->
+            <!--</p>-->
+            <!--<p class="tip">-->
+                <!--<span>或得奖励</span>100积分-->
+            <!--</p>-->
+        </div>
+        <!--<div class="test"></div>-->
+        <!--<div class="bzst">-->
+            <!--<div class="title">-->
+                <!--<span>编制试题</span>-->
+                <!--<el-button class="right" type="warning" round>编制试题</el-button>-->
+            <!--</div>-->
+            <!--<ul class="clearfix">-->
+                <!--<li :class="index == 0 ? 'first-child item' : 'item'" v-for="(item,index) in 6" :key="index">-->
+                    <!--<p class="task-item-title">-->
+                        <!--<span class="source">试题{{index+1}} | 题型：单选题</span>-->
+                        <!--<span class="time">分值：2分</span>-->
+                    <!--</p>-->
+                    <!--<div class="task-item-content clearfix">-->
+                        <!--<div class="tip-wrap left">-->
+                            <!--&lt;!&ndash; 试题组件 &ndash;&gt;-->
+                        <!--</div>-->
+                        <!--<dd class="btn-wrap left">-->
+                            <!--<span >采纳 </span>-->
+                        <!--</dd>-->
+                    <!--</div>-->
+                <!--</li>-->
+            <!--</ul>-->
+        <!--</div>-->
+    </div>
+</template>
+<script>
+  import api from './api'
+  //当前组件引入全局的util
+    let Util = null
+    export default {
+        data(){
+            return{
+              // id: '',
+              // viewData: null,
+              tableData:[],
+              id: '',
+              viewData: null,
+              viewType: '',
+              isJoin: false, // 是否是首次参加
+              error: false,
+              headerContent: {
+                addId: {
+                  id: 'addId',
+                  title: '编制试题'
+                }
+              },
+              taskType: '',
+            }
+        },
+        methods:{
+            init(){
+              Util = this.$util
+              let {productId} = this.$route.query
+              // let {type, id} = this.$route.params
+              // if (!['groupQuestion', 'setQuestion'].includes(type) && !isNaN(id)) {
+              //   this.error = true
+              //   return
+              // }
+              // let {isJoin} = this.$route.query
+              // this.isJoin = isJoin || false
+              // this.viewType = type
+              this.id = productId
+              this.getViewData()
+                // console.log(this.id,111)
+            },
+          getViewData () {
+            let opt = {
+              ajaxSuccess: res => this.viewData = res.data,
+              ajaxParams: {
+                url: api.gamesAnswer.path,
+                method: api.gamesAnswer.method,
+                params: {
+                  id: this.id
+                }
+              }
+            }
+            this.ajax(opt)
+
+          },
+          // ajaxSuccessData(res){
+          //   console.log(res.data,2222)
+          // }
+        },
+        created(){
+
+        },
+        mounted(){
+            this.init()
+        },
+      filters: {
+        taskType (val) {
+          let type = {
+            groupQuestion: '众包组题',
+            setQuestion: '集题投稿',
+          }
+          return type[val] || val
+        },
+      },
+        components:{
+
+        }
+    }
+</script>
+<style lang="scss">
+    @import '../css/task_goon.scss'
+</style>

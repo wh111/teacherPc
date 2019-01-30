@@ -1,0 +1,92 @@
+.selfContent-wrap{
+    width: 100%;
+    background: #efefef;
+}
+.selfContent{
+    width: 1200px;
+    min-height: 700px;
+    margin:0 auto;
+}
+.selfContent .path{
+    font-size: 14px;
+    line-height: 40px;
+    color: #727272;
+}
+.main-left{
+    width: 220px;
+    background: #edf9e3;
+    color: #716d6d;
+    border-radius: 5px;
+}
+.main-left-introduce{
+    height: 270px;
+    background: url(../images/self-bg.jpg);
+    border-radius: 5px 5px 0 0 ;
+    background-size: 100% 100%;
+}
+.introduce-head{
+    text-align: center;
+    cursor: pointer;
+}
+.introduce-head img{
+    height: 100px;
+    width: 100px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    margin-top: 16px;
+}
+.introduce-name{
+    color: #313131;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 5px;
+}
+.introduce-tip{
+    margin-left: 36px;
+    font-size: 12px;
+    color: #434343;
+    margin-top: 20px;
+}
+
+.introduce-tip a {
+    color: #716d6d;
+}
+.introduce-tip .getmoney{
+    display: inline-block;
+    padding:1px 4px;
+    border-radius: 9px;
+    background-color: #fd7416;
+    margin-left: 10px;
+    color: #ffffff;
+    cursor:pointer;
+}
+.main-left-item:last-child{
+    border-radius: 0 0 5px 5px;
+}
+.main-left-item{
+    line-height: 40px;
+    border-top:1px solid #f5f5f5;
+    background: #ffffff;
+    cursor:pointer;
+    font-size: 14px;
+    color: #727272;
+}
+.main-left-item a{
+    color:#716d6d;
+}
+.main-left-item-active a{
+    color: #1cc03b;
+}
+.main-left-item-active{
+    display: block;
+    width: 220px;
+    height: 40px;
+    color: #1cc03b;
+    background: #f7f7f7;
+    font-weight: bold;
+}
+.main-left-item .main-left-item-icon{
+    display: inline-block;
+    margin: 0 10px 0 30px;
+}

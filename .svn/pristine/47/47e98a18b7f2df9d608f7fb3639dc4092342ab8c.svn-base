@@ -1,0 +1,81 @@
+$topBgColor: #efefef;
+$borderColor: #e5e5e5;
+$orangeColor: #fd7416;
+$leftAndRightPadding: 20px;
+
+.orange {
+  color: #fff !important;
+  background-color: $orangeColor !important;
+  border-color: $orangeColor !important;
+  a {
+    color: #fff !important;
+    text-decoration: none;
+    &:hover {
+      text-decoration: none !important;
+    }
+  }
+}
+
+.tableNoDataTips {
+  line-height: 200px;
+  text-align: center;
+}
+
+.questionBankListItem {
+  margin-top: 30px;
+  border: 1px solid $borderColor;
+  .topBox {
+    height: 40px;
+    line-height: 40px;
+    background-color: $topBgColor;
+    border-bottom: 1px solid $borderColor;
+  }
+  .leftInfo {
+    padding-left: $leftAndRightPadding;
+    span {
+      margin-right: 20px;
+    }
+  }
+  .rightInfo {
+    padding-right: $leftAndRightPadding;
+    span {
+      color: #9f9f9f;
+    }
+  }
+  .contentBox {
+    height: 76px;
+    padding: 20px;
+    a {
+      color: #666;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  .todoBtnBox {
+    border-left: 1px solid $borderColor;
+    padding: 0;
+  }
+  .todoBtns {
+    padding: 12px;
+    margin-top: 21px;
+  }
+  .contentTitle {
+    font-weight: bolder;
+  }
+  .contentText {
+    overflow: hidden;
+    height: 100%;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    display: -webkit-box; /** 将对象作为伸缩盒子模型显示 **/
+    -webkit-box-orient: vertical; /** 设置或检索伸缩盒对象的子元素的排列方式 **/
+    -webkit-line-clamp: 2; /** 显示的行数 **/
+    overflow: hidden; /** 隐藏超出的内容 **/
+    &.line1 {
+      height: 22px;
+      line-height: 22px;
+      -webkit-line-clamp: 1;
+    }
+  }
+}

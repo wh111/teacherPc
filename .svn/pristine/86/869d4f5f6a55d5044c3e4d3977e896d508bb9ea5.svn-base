@@ -1,0 +1,499 @@
+/*
+****--@file     index
+****--@date     2018/3/15 上午11:07
+****--@author   jhd
+****--@describe   教师个人中心路由
+*/
+
+import { utils } from '../../libs/util'
+
+const teachCenter = {
+  path: '/selfCenter',
+  name: 'selfCenter',
+  component: resolve => {
+    require.ensure([], () => {
+      resolve(require('../../components/common/teacherMenu.vue'))
+    }, 'selfCenter')
+  },
+  redirect: to => {
+    return utils.pathPrefix + '/selfCenter/selfCenterdetail'
+  },
+  children: [
+    {
+      // 首页
+      path: 'selfCenterdetail',
+      name: 'selfCenterdetail',
+      meta: {
+        name: '首页' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/index/index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 班组管理
+      path: 'groupManage',
+      name: 'groupManage',
+      meta: {
+        name: '班组管理' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupManage/groupManage_index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 首页
+      path: 'selfCenterdetail',
+      name: 'selfCenterdetail',
+      meta: {
+        name: '首页' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/index/index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 班组管理
+      path: 'groupManage',
+      name: 'groupManage',
+      meta: {
+        name: '班组管理' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupManage/groupManage_index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 班组报告
+      path: 'groupReport',
+      name: 'groupReport',
+      meta: {
+        name: '班组报告' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/groupReport_index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 班组报告 - 查看批改情况
+      path: 'showCorrecting',
+      name: 'showCorrecting',
+      meta: {
+        name: '班组报告' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/components/correcting.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 班组报告 - 作答分析
+      path: 'answerAnalysis',
+      name: 'answerAnalysis',
+      meta: {
+        name: '班组报告' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/components/answerAnalysis.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    /** ******************** 题库开始 **********************/
+    {
+      // 题库
+      path: 'questionBank',
+      name: 'questionBank',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/questionBank_index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 题库-我的题库-试题操作（添加/修改）
+      path: 'myQuestion/:type/:id',
+      name: 'myQuestionTodo',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/myTestQuestion/input'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 题库-我的题库-试题查看
+      path: 'myQuestions/:type/:id',
+      name: 'myQuestionView',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/myTestQuestion/view'))
+        }, 'selfCenter')
+      }
+    },
+    // {
+    //   // 题库-易错题-试题查看
+    //   path: 'fallibilityAndDifficults/:type/:id',
+    //   name: 'fallibilityAndDifficultView',
+    //   meta: {
+    //     name: '题库' // 表示菜单显示
+    //   },
+    //   component: resolve => {
+    //     require.ensure([], () => {
+    //       resolve(require('../../page/questionBank/fallibilityAndDifficult/view'))
+    //     }, 'selfCenter')
+    //   }
+    // },
+    {
+      // 题库-我的题库-题库查看
+      path: 'thematicLibrarys/:type/:id',
+      name: 'thematicLibraryView',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/thematicLibrary/view'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 题库-专题库-题库操作（添加/修改）
+      path: 'thematicLibrary/:type/:id',
+      name: 'thematicLibraryTodo',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/thematicLibrary/input'))
+        }, 'selfCenter')
+      }
+    },
+    /** ******************** 题库结束 ************************/
+    {
+      // 开始任务
+      path: 'task_goon',
+      name: 'task_goon',
+      meta: {
+        name: '任务中心' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/taskCenter/task_goon.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 疑难问题
+      path: 'Troubleshooting',
+      name: 'Troubleshooting',
+      meta: {
+        name: '疑难问题' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Troubleshooting/Troubleshooting_index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 个人资料
+      path: 'userInfo',
+      name: 'userInfo',
+      meta: {
+        name: '个人资料' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/selfData/selfData.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 意见反馈
+      path: 'Feedback',
+      name: 'Feedback',
+      meta: {
+        name: '意见反馈' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Feedback/Feedback_index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 任务信息
+      path: 'metionMessage',
+      name: 'metionMessage',
+      meta: {
+        name: '意见反馈' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/taskCenter/components/metionMessage.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 系统信息
+      path: 'systemMessage',
+      name: 'systemMessage',
+      meta: {
+        name: '意见反馈' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/systemMessage/systemMessage.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 班组报告
+      path: 'groupReport',
+      name: 'groupReport',
+      meta: {
+        name: '班组报告' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/groupReport_index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 题库
+      path: 'questionBank',
+      name: 'questionBank',
+      meta: {
+        name: '题库' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/questionBank/questionBank_index.vue'))
+        }, 'selfCenter')
+      }
+
+    },
+    {
+      // 任务中心
+      path: 'taskCenter',
+      name: 'taskCenter',
+      meta: {
+        name: '任务中心' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/taskCenter/index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 任务中心 - 众包组题|集题投稿-开始任务
+      path: 'startTask/:type/:id',
+      name: 'startTask',
+      meta: {
+        name: '开始任务' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/taskCenter/setQuestion/startTask'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 疑难问题
+      path: 'Troubleshooting',
+      name: 'Troubleshooting',
+      meta: {
+        name: '疑难问题' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Troubleshooting/Troubleshooting_index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 个人资料
+      path: 'userInfo',
+      name: 'userInfo',
+      meta: {
+        name: '个人资料' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/selfData/selfData.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 意见反馈
+      path: 'Feedback',
+      name: 'Feedback',
+      meta: {
+        name: '意见反馈' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Feedback/Feedback_index.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 任务信息
+      path: 'metionMessage',
+      name: 'metionMessage',
+      meta: {
+        name: 'r任务信息' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/taskCenter/components/metionMessage.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 系统信息
+      path: 'systemMessage',
+      name: 'systemMessage',
+      meta: {
+        name: '系统信息' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/systemMessage/systemMessage.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 创建试卷（布置作业|人工组卷|智能组卷|模版组卷）
+      path: 'createPaper/:type/:groupId',
+      name: 'createPaper',
+      meta: {
+        name: '布置作业' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/createPaper/index'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 试题预览（布置作业|人工组卷|智能组卷|模版组卷）
+      path: 'preview/:type',
+      name: 'preview',
+      meta: {
+        name: '试题预览' // 表示菜单显示
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/createPaper/preview'))
+        }, 'selfCenter')
+      }
+    },
+    {
+      // 人工组卷
+      path: 'createByPerson',
+      name: 'createByPerson',
+      meta: {
+        name: '人工组卷'
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupManage/components/createByPerson.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {// 班组报告问题详情
+      path: 'groupDetailOfQuestion',
+      name: 'groupDetailOfQuestion',
+      meta: {
+        name: '班组报告问题详情' //
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/components/groupDetailOfQuestion.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {// 班组报告历史测评做题分析
+      path: 'answerAnalysis',
+      name: 'answerAnalysis',
+      meta: {
+        name: '班组报告历史测评做题分析' //
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/components/answerAnalysis.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {// 我来解答
+      path: 'makeAnswer',
+      name: 'makeAnswer',
+      meta: {
+        name: '我来解答' //
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Troubleshooting/components/makeAnswer.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {// 解答详情
+      path: 'searchDetail',
+      name: 'searchDetail',
+      meta: {
+        name: '我来解答' //
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/Troubleshooting/components/searchDetail.vue'))
+        }, 'selfCenter')
+      }
+    },
+    {// 试题详情
+      path: 'groupDetailOfQuestion',
+      name: 'groupDetailOfQuestion',
+      meta: {
+        name: ' 试题详情' //
+      },
+      component: resolve => {
+        require.ensure([], () => {
+          resolve(require('../../page/groupReport/components/groupDetailOfQuestion.vue'))
+        }, 'selfCenter')
+      }
+    }
+
+  ]
+}
+export default teachCenter

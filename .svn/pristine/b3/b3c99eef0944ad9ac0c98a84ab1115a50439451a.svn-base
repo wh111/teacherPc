@@ -1,0 +1,363 @@
+<!--
+****--@file     manageGroup
+****--@date     2018/3/16 10:41
+****--@author   wh
+****--@describe   班级群管理
+-->
+<template>
+    <div class="manageGroupdetail-root">
+
+        <div style="position: absolute;right: 0;top: 0;">
+            <div class="groupsDetailRight">
+                <div class="grouplist">
+                    <p class="tatal">群成员 <span style="float: none">{{totalCount}}人</span>
+                        <el-button class="button" @click="open('addpeople','添加群成员')">添加</el-button>
+                    </p>
+                    <div style="overflow: auto;height: 374px;overflow-x: hidden;width: 250px">
+                        <div class="person" v-for="(item,index) in groupMessage">
+                            <div class="pic"><img :onerror="onerrImg" style="width: 30px;height: 30px" :src="item.icon||'11111'"/></div>
+                            <div style="display: inline-block;width: 130px;float: left">
+                            <span class="name" style="max-width: 82px;overflow: hidden;display: inline-block;height: 50px;word-break:break-all;">{{item.name}}</span>
+                            <!--<span class="warn" v-if="item.realStatus==0">未实名</span>-->
+                            <span class="warn" style="" v-if="!item.realStatus" @click="cliclRealName(item.id)">未实名</span>
+                            </div>
+                            <button @click="deletePerson(item)">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+        <el-form onsubmit="return false;" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px"
+                 style="text-align:left;width: 450px" class="base-introduce">
+            <el-form-item label="群名称:" prop="title">
+                <el-input :span="8" v-model="ruleForm.title"></el-input>
+            </el-form-item>
+            <el-form-item label="群号:" prop="no">
+                {{ruleForm.no}}
+            </el-form-item>
+            <el-form-item label="创建时间:" prop="createTime">
+                {{ruleForm.createTime | formatDate('yyyy-MM-dd HH:mm')}}
+            </el-form-item>
+            <el-form-item label="群简介:" prop="IdCard">
+                <el-input :span="8" type="textarea" v-model="ruleForm.remark" :rows="2"></el-input>
+            </el-form-item>
+            <el-form-item label="群通知:" prop="IdCard">
+                <div v-if="messageList.length==0">暂无群通知</div>
+                <div v-for="(item,index) in messageList">
+                    <p style="text-align: left">{{index + 1}}.{{item.content}}</p>
+                    <p style='height: 32px;font-size: 12px'><span
+                            style="float: right"> 发布时间：{{item.createTime | formatDate('yyyy-MM-dd HH:mm')}}</span></p>
+                </div>
+            </el-form-item>
+
+        </el-form>
+        <div class="footer">
+            <el-button @click="open('deletePeople','删除群组')" class="btn">删除群组</el-button>
+            <el-button @click="open('createMessage','新建群通知')" class="btn">新建群通知</el-button>
+            <load-btn style="padding: 10px 30px;" @listenSubEvent="listenSubEvent" :btnData="loadBtn"></load-btn>
+        </div>
+        <!--删除群组/创建群通知-->
+        <Modal :mask-closable="false" width="360" title="删除群组/创建群通知" v-model="openModel"
+               class-name="toOpenModel" :loading="loading">
+            <modal-header slot="header" :content="toOpenModel"></modal-header>
+            <opt v-if="openModel" @cancel="cancel" :type="type" :id='id' :ruleForm='ruleForm' :typeOfSmall="typeOfSmall"
+                 @closeModel="closeModel"></opt>
+        </Modal>
+    </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+  import { groupMessage as rules } from './rules'
+  import opt from './components/deleteOrCreatemessage.vue'
+  import api from './api'
+
+  let Util = null
+  export default {
+    props: ['id','typeOfSmall'],
+    data () {
+      return {
+        onerrImg:'this.src="' + require('../../assets/images/man.png') + '"',
+        rules,
+        messageList: [],
+        loading: true,
+        ruleForm: {},
+        totalCount: 0,
+        groupMessage: [],
+        openModel: false,
+        type: '',
+        toOpenModel: {
+          id: 'toOpenModelId',
+          title: ''
+        },
+        loadBtn: {title: '保存', callParEvent: 'listenSubEvent'},
+
+      }
+    },
+    methods: {
+      //初始化请求列表数据
+      init () {
+        console.log(1)
+        Util = this.$util
+        this.getGroups()//获取群组详情
+        this.groupsNotice()//获取群组通知
+        this.requestDetail();
+      },
+      //获取班组成员列表
+      requestDetail () {
+        this.ajax({
+          ajaxSuccess: 'getListSuccsee',
+          ajaxParams: {
+            url: api.request.path,
+            method: api.request.method,
+            params: {
+              id: this.id//
+            },
+          },
+        })
+      },
+      getListSuccsee (res) {
+        this.groupMessage = res.data.dataList
+        this.groupMessage.map((item) => {item.icon = this.getStaticPath(item.icon)})
+        this.totalCount = res.data.totalCount
+      },
+      deletePerson (val) {//删除群组成员
+        this.ajax({
+          ajaxSuccess: () => {
+            this.successMess('删除成功')
+            this.$emit('reRequset')
+            this.requestDetail()
+          },
+          ajaxParams: {
+            url: api.removeStudent.path,
+            method: api.removeStudent.method,
+            params: {
+              id: this.id,
+              studentId: val.id
+            },
+          }
+        })
+      },//点击实名
+      cliclRealName(val){
+        this.ajax({
+          ajaxSuccess: res => {
+            this.successMess('已提醒实名')
+          },
+          ajaxParams: {
+            url: api.trueName.path,
+            method: api.trueName.method,
+            data: {
+              studentId: val,
+              userType:'Student'
+            },
+          },
+        })
+      },
+      getGroups () {
+        this.ajax({
+          ajaxSuccess: res => {
+            this.ruleForm = res.data
+          },
+          ajaxParams: {
+            url: api.getDetail.path,
+            method: api.getDetail.method,
+            params: {
+              id: this.id
+            },
+          },
+        })
+      },
+      groupsNotice () {
+        this.ajax({
+          ajaxSuccess: res => {
+            this.messageList = res.data.dataList;
+            this.messageList.map((item) => {
+                item.content = item.content.replace(/\*/g, '')
+            })
+          },
+          ajaxParams: {
+            url: api.message.path,
+            method: api.message.method,
+            params: {
+              id: this.id,
+              curPage: 1,
+              pageSize: 5
+            },
+          },
+        })
+      },
+      cancel () {
+        this.openModel = false
+      },
+      open (val, title) {
+        this.openModel = true
+        this.toOpenModel.title = title
+        this.type = val
+      },
+      closeModel (val) {
+        this.openModel = false
+        if (this.type == 'createMessage') {
+          this.groupsNotice()
+        } else if (this.type == 'deletePeople') {
+          this.$emit('changeGroupSuccess')
+        } else if (this.type == 'addpeople') {
+          this.requestDetail()
+          this.$emit('reRequset')
+
+        }
+
+      },
+      /*
+     * 点击提交按钮 监听是否验证通过
+     * @param formName string  form表单v-model数据对象名称
+     * @return flag boolean   form表单验证是否通过
+     * */
+      submitForm (formName) {
+        let flag = false
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            flag = true
+          }
+        })
+        return flag
+      },
+      listenSubEvent (isLoadingFun) {
+        let isSubmit = this.submitForm('ruleForm')
+        if (isSubmit) {
+          if (!isLoadingFun) isLoadingFun = function () {
+          }
+          isLoadingFun(true)
+          this.ajax({
+            ajaxSuccess: res => {
+              this.successMess('保存成功');
+              this.$emit('getGroupList',this.ruleForm.title)
+            },
+            ajaxParams: {
+              url: api.modifyGroup.path,
+              method: api.modifyGroup.method,
+              data: {
+                title: this.ruleForm.title,
+                remark: this.ruleForm.remark,
+                id: this.id
+              },
+            },
+          }, isLoadingFun)
+        }
+      },
+
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+    },
+    components: {
+      opt
+    }
+  }
+
+</script>
+<style lang="scss">
+    .tomanageTitle .ivu-modal-footer {
+        display: none;
+    }
+
+    .manageGroupdetail-root {
+        .footer {
+            margin: 0 auto;
+            text-align: center;
+            margin-top: 20px;
+            button {
+                background-color: #ff9f00;
+                color: white;
+            }
+        }
+        button {
+            cursor: pointer;
+            border: none;
+        }
+        .base-introduce {
+            min-height: 400px;
+        }
+        position: relative;
+        .groupsDetailRight {
+            overflow: hidden;
+            float: right;
+            width: 260px;
+            height: 420px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            border: solid 1px #e5e5e5;
+            padding-left: 20px;
+            margin-right: 30px;
+            margin-bottom: 46px;
+            .grouplist {
+                width: 220px;
+                .tatal {
+                    border-bottom: 1px solid #e5e5e5;
+                    line-height: 50px;
+                    height: 40px;
+                    span {
+                        float: right;
+                    }
+                }
+                .button {
+                    float: right;
+                    margin-top: 15px;
+                    width: 60px;
+                    height: 20px;
+                    border-radius: 3px;
+                    background-color: #ff9f00;
+                    line-height: 20px;
+                    color: #e5e5e5;
+                    font-size: 12px;
+                    border: none;
+                    display: inline-block;
+                    line-height: 2px;
+
+                }
+                .person {
+                    text-align: left;
+                    height: 50px;
+                    display: block;
+                    line-height: 50px;
+                    font-size: 12px;
+                    clear: both;
+                    .name {
+                        font-weight: bold;
+                        float: left;
+                        padding-left: 3px;
+                    }
+                    .warn {
+                        color: #fc4341;
+                        float: left;
+                        padding-left: 3px;
+                        cursor: pointer;
+                    }
+                    .pic {
+                        width: 30px;
+                        height: 30px;
+                        float: left;
+                        margin-top: 10px;
+                        overflow: hidden;
+                        border-radius: 100%;
+                        background-image: url("../../assets/images/person.gif");
+                    }
+                    button {
+                        display: inline-block;
+                        width: 60px;
+                        height: 20px;
+                        border-radius: 3px;
+                        background-color: #ff9f00;
+                        line-height: 20px;
+                        color: #e5e5e5;
+                        font-size: 12px;
+                        border: none;
+                    }
+                }
+
+            }
+
+        }
+    }
+</style>

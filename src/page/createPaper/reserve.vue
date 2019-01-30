@@ -1,0 +1,77 @@
+<!--
+****--@file     reserve
+****--@date     2018/5/3 13:39
+****--@author   ${王恒}
+****--@describe   保存模板
+-->
+<template>
+    <div class="template-root">
+        <el-row style="line-height: 30px">
+            <el-col :span="6">
+                模板名称：
+            </el-col>
+            <el-col :span="18">
+                <el-input v-model="tmepTitle"></el-input>
+            </el-col>
+        </el-row>
+        <div style="text-align: center;margin-top: 10px">
+            <el-button @click="sure" class="reserve-button">确定</el-button>
+            <el-button @click="cancelModel" class="reserve-button">取消</el-button>
+        </div>
+    </div>
+</template>
+<script>
+  /*当前组件必要引入*/
+  // import intelligent from './intelligent.vue'
+  let Util = null
+  export default {
+    props: ['title'],
+    data () {
+      return {tmepTitle: ''}
+    },
+    methods: {
+      //初始化请求列表数据
+      init () {
+        Util = this.$util
+        this.tmepTitle = this.title
+        console.log(this.tmepTitle)
+      },
+      sure () {
+        // this.title=this.tmepTitle
+        this.list=this.tmepTitle
+        this.$emit('emit', this.list)
+        console.log(this.list)
+      },
+      cancelModel () {
+        this.$emit('cancel')
+        // console.log(this.cancel)
+      },
+
+    },
+    created () {
+      this.init()
+    },
+    mounted () {
+    },
+    components: {
+      // intelligent
+    }
+  }
+
+</script>
+<style lang="scss">
+    .template-root {
+        .reserve-button {
+            background: #fd7416;
+            border: none;
+            margin-top: 10px;
+            color: white;
+        }
+        .reserve-button:hover {
+            background: #fd7416;
+            border: none;
+            margin-top: 10px;
+            color: white;
+        }
+    }
+</style>

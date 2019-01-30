@@ -1,0 +1,315 @@
+.groupManage-root {
+    button {
+        cursor: pointer;
+        border: none;
+    }
+    border-radius: 5px;
+    margin: 0 30px;
+    .passGrade1-p {
+        color: #fd7416;
+        margin-top: -251px;
+        font-size: 14px
+    }
+    #passGrade1 {
+        width: 550px;
+        height: 248px;
+        span {
+            color: #fd7416;
+            font-size: 14px;
+            padding: 0
+        }
+    }
+    .growthArchives-root-timeborder {
+        width: 50px;
+        position: absolute;
+        right: 15px;
+        .focus {
+            background-color: #fd7416 !important;
+            color: #ffffff !important;
+            border: none !important;
+            width: 60px;
+        }
+        .seeHistory {
+            float: right;
+            height: 30px;
+            margin-right: 5px;
+            border-radius: 3px;
+            background-color: #ffffff;
+            border: solid 1px #cccccc;
+            padding: 0 8px;
+            font-size: 12px;
+            line-height: 30px;
+            color: #898989;
+            margin-bottom: 5px;
+            span {
+                padding: 0;
+            }
+        }
+        .seeHistory:hover {
+            background-color: #eeeeee;
+        }
+        .focus:hover{
+            background-color: #ec641c !important;
+        }
+
+    }
+    .h1 {
+        font-size: 20px;
+        margin-top: 35px;
+    }
+    .err {
+        width: 100%;
+        height: 100%;
+        background-color: white;
+        text-align: center;
+        margin: 0 auto;
+        padding-top: 200px;
+    }
+    .tab {
+        width: 680px;
+        float: left;
+    }
+    .left {
+        float: left;
+
+    }
+    .banji {
+        line-height: 40px;
+        color: #d1d1d1;
+        font-size: 14px;
+    }
+    .el-dropdown-link {
+        font-size: 12px;
+        line-height: 40px;
+        color: #1cc03b;
+    }
+    .groupManage-top {
+        line-height: 40px;
+        height: 49px;
+        z-index: 10;
+        margin-bottom: 20px;
+    }
+    .groupManage-top-but {
+
+        border-top: solid 1px #e5e5e5;
+        line-height: 50px;
+        text-align: center;
+        button {
+            background-color: #fd7416;
+        }
+
+    }
+    #passGrade1 div {
+        top: -425px
+    }
+    .groupsDetailtitle {
+        div {
+            width: 4px;
+            height: 20px;
+            margin-left: 0px;
+            display: inline-block;
+            position: relative;
+            top: 5px;
+        }
+        margin: 5px 5px;
+        font-size: 13px;
+        .textArea textarea{
+          max-height: 50px;
+        }
+
+    }
+    .right {
+        background-color: #f4f4f4;
+        margin-left: 260px;
+        height: 650px;
+        float: none;
+        .pic {
+            padding-top: 36px;
+            overflow: hidden;
+            border-radius: 100%;
+            text-align: center;
+            margin: 0 auto;
+            .sex {
+                img {
+                    position: relative;
+                    top: 6px;
+                }
+            }
+            ul {
+                margin-left: 235px;
+                text-align: left;
+                font-size: 12px;
+                line-height: 24px;
+                color: #434343;
+                margin-top: 20px;
+                button {
+                    margin-left: 10px;
+                    padding: 6px 15px;
+                    float: none;
+                    position: relative;
+                    background-color: rgb(253, 116, 22);
+                    color: white;
+                    span {
+                        padding: 0;
+                    }
+
+                }
+            }
+        }
+        p {
+            line-height: 32px;
+            text-align: center;
+        }
+        span {
+            padding: 0 20px;
+        }
+        button {
+            float: right;
+        }
+        .span {
+            position: relative;
+            left: -38px;
+        }
+    }
+    .titel {
+        margin-right: 15px;
+        cursor: pointer;
+    }
+    .active {
+        color: #fd7416;
+    }
+    .but {
+        color: #11a63f;
+        border: 1px solid #11a63f;
+        background-color: white;
+        margin: 0 7px;
+        margin-top: 3px;
+    }
+    .makeMessage{
+        margin-top: 10px;
+        background-color:#fd7416;
+        color: white;
+        border:none
+    }
+    .tabs {
+        font-size: 14px;
+    }
+    .groupsDetailRight {
+        float: left;
+        width: 260px;
+        overflow: hidden;
+        border-radius: 5px;
+        background-color: #ffffff;
+        border: solid 1px #e5e5e5;
+
+        margin-right: 30px;
+        margin-bottom: 46px;
+        .tile {
+            padding-left: 20px;
+            padding-right: 20px;
+            height: 40px;
+            font-size: 12px;
+            border-bottom: solid 1px #e5e5e5;
+            line-height: 40px;
+            img {
+                position: relative;
+                top: 3px
+            }
+        }
+        .grouplist {
+            width: 272px;
+            textarea{
+                max-height: 50px;
+            }
+            .tatal {
+                border-bottom: 1px solid #e5e5e5;
+                line-height: 50px;
+                height: 40px;
+                span {
+                    float: right;
+                }
+            }
+            .button {
+                float: right;
+                margin-top: 15px;
+                width: 60px;
+                height: 20px;
+                border-radius: 3px;
+                background-color: #ff9f00;
+                line-height: 20px;
+                color: #e5e5e5;
+                font-size: 12px;
+                border: none;
+                display: inline-block;
+                line-height: 2px;
+            }
+            .person {
+                padding-left: 20px;
+                text-align: left;
+                height: 50px;
+                display: block;
+                line-height: 50px;
+                font-size: 12px;
+                width: 258px;
+                .name {
+                    font-weight: bold;
+                    float: left;
+                    padding-left: 3px;
+                }
+                .warn {
+                    color: #fc4341;
+                    float: left;
+                    padding-left: 3px;
+                }
+                .bottom {
+                    color: red;
+                    float: right;
+                    font-size: 20px;
+                }
+                .top {
+                    color: #bfbfbf;
+                    float: right;
+                    font-size: 20px;
+
+                }
+                .pic {
+                    width: 30px;
+                    height: 30px;
+                    float: left;
+                    margin-top: 10px;
+                    overflow: hidden;
+                    border-radius: 100%;
+                    background-image: url("../../assets/images/person.gif");
+                }
+                .pos {
+                    float: left;
+                    padding: 0 10px;
+                    img {
+                        position: relative;
+                        top: 3px;
+                    }
+                }
+                button {
+                    float: right;
+                    margin-top: 15px;
+                    width: 60px;
+                    height: 20px;
+                    border-radius: 3px;
+                    background-color: #ff9f00;
+                    line-height: 20px;
+                    color: #e5e5e5;
+                    font-size: 12px;
+                    border: none;
+                    display: inline-block;
+
+                }
+            }
+            .personActive {
+                background-color: #f4f4f4;
+            }
+
+        }
+
+    }
+
+}

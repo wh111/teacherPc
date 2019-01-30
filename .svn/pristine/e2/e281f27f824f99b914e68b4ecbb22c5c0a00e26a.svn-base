@@ -1,0 +1,28 @@
+const file = '/'//当前模块api前缀
+const api = {
+  query: {//班组动态
+    path: '/groupsNews/query',
+    method: 'get'
+  },
+  work: {//查询作业（最新作业）
+    path: '/work/query',
+    method: 'get'
+  },
+  get: {//
+    path: file + '/get?id=',
+    method: 'get'
+  },
+  modify: {//
+    path: file + '/modify',
+    method: 'put'
+  },
+  delete: {//
+    path: file + '/remove?ids=',
+    method: 'delete'
+  },
+  infoImg: { // 知识图谱
+    path: 'knowledge/infoImg',
+    method: 'get'
+  }
+}
+export default api 

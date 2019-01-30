@@ -1,0 +1,87 @@
+$greenColor: #11A63F;
+$borderColor: #dcdcdc;
+$stepBorderColor: #c5c4c0;
+$stepBgColor: #f5f5f5;
+$activeColor: #fd7416;
+
+.qtt_chartMain {
+  padding: 20px 0;
+}
+
+.qtt_chartBox {
+  height: 200px;
+}
+
+.assignment {
+  padding: 20px;
+}
+
+.aTopTitle {
+  font-size: 20px;
+  color: $greenColor;
+  padding-bottom: 5px;
+  border-bottom: 1px solid $borderColor;
+  margin-bottom: 10px;
+}
+
+.aStepBox {
+  background-color: $stepBgColor;
+  margin-bottom: 10px;
+}
+
+.aStep {
+  width: 360px;
+  margin: 0 auto;
+  padding: 15px 0;
+  .el-step {
+    height: 25px
+  }
+}
+
+.amTitleInput {
+  width: 634px
+}
+
+.amTimeInput {
+  width: 130px
+}
+
+.amSetTime {
+  margin-bottom: 0 !important;
+  .el-form-item__content {
+    margin-left: 0 !important;
+  }
+  .amstEnd {
+    margin-left: 20px;
+  }
+  .amSetTime1{
+    .el-form-item__label:before{
+      content: '' !important;
+    }
+  }
+
+}
+
+.amQuestionType {
+  .el-checkbox + .el-checkbox {
+    margin-left: 0;
+  }
+  .el-checkbox {
+    margin-right: 30px;
+  }
+}
+
+.amRadioGroup {
+  .el-radio {
+    margin-right: 30px;
+    margin-left: 0px;
+    line-height: 32px
+  }
+}
+
+.amGrade {
+}
+
+.amFooterBtn {
+  padding: 20px 0;
+}
